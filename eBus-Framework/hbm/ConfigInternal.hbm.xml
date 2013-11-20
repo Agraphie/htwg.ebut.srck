@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="ConfigInternal" table="config_internal">
+	
+		<id	name="Id" column="id"
+			type="integer">
+			<generator class="increment"/>
+		</id>
+
+		<property name="MarginOnSales" column="margin_on_sales"
+			type="integer" not-null="true" length="11"/>
+
+		<property name="ThresholdReorder" column="threshold_reorder"
+			type="integer" not-null="true" length="11"/>
+
+		<property name="NumberToReorder" column="number_to_reorder"
+			type="integer" not-null="true" length="11"/>
+
+		<property name="MultimediaDocroot" column="multimedia_docroot"
+			type="string" not-null="true" length="256"/>
+
+		<many-to-one name="Wholesaleraddress" column="wholesaleraddress" lazy="false"
+			class="Address" not-null="true">			
+		</many-to-one>
+
+	</class>	
+</hibernate-mapping>

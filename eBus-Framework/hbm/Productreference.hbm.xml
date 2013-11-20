@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="Productreference" table="productreference" check="product &lt; &gt; referencedproduct">
+
+		<composite-id name="Id" class="ProductreferencePK">
+			<key-many-to-one name="Product"	column="product"
+				class="Product"/>
+
+			<key-many-to-one name="Referencedproduct" column="referencedproduct"
+				class="Product"/>
+		</composite-id>
+
+		<property name="Referencetype" column="referencetype"
+			type="string" not-null="false" length="64"/>
+
+		<property name="Quantity" column="quantity"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="Remark" column="remark"
+			type="string" not-null="false" length="256"/>
+
+	</class>	
+</hibernate-mapping>

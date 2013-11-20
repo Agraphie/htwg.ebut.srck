@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="InvoiceShipmentPurchase" table="invoice_shipment_purchase">
+
+		<composite-id>
+			<key-property name="Shipment" column="shipment"
+				type="string" />
+			<key-property name="Invoice" column="invoice"
+				type="string" />
+		</composite-id>
+
+	</class>
+</hibernate-mapping>

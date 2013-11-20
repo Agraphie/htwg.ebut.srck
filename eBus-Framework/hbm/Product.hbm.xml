@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="Product" table="product">
+
+		<id	name="materialnumber" column="materialnumber"
+			type="integer">
+			<generator class="increment"/>		
+		</id>
+		
+		<property name="OrdernumberSupplier" column="ordernumber_supplier"
+			type="string" not-null="true" length="40"/>
+
+		<property name="Shortdescription" column="shortdescription"
+			type="string" not-null="true" length="256"/>
+
+		<property name="Longdescription" column="longdescription"
+			type="string" not-null="false"/>
+
+		<property name="OrdernumberCustomer" column="ordernumber_customer" unique="true"
+			type="string" not-null="true" length="40"/>
+
+		<property name="ShortdescriptionCustomer" column="shortdescription_customer"
+			type="string" not-null="false" length="256"/>
+
+		<property name="LongdescriptionCustomer" column="longdescription_customer"
+			type="string" not-null="false"/>
+
+		<property name="Manufacturertypedescription" column="manufacturertypedescription"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Manufacturer" column="manufacturer"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Productstatus" column="productstatus"
+			type="string" not-null="false" length="64"/>
+
+		<property name="Producttype" column="producttype"
+			type="string" not-null="false" length="64"/>
+
+		<property name="Remark" column="remark"
+			type="string" not-null="false" length="256"/>
+
+		<many-to-one name="Productcategory" column="productcategory" lazy="false"
+			class="Productcategory" not-null="false">
+		</many-to-one>
+
+		<many-to-one name="Supplier" column="supplier" lazy="false"
+			class="Supplier" not-null="true">
+		</many-to-one>
+
+	</class>	
+</hibernate-mapping>

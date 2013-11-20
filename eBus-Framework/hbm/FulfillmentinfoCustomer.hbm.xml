@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="FulfillmentinfoCustomer" table="fulfillmentinfo_customer">
+		
+		<id name="Fulfillmentinfoid" column="fulfillmentinfoid"
+			type="string">
+			<generator class="assigned"/>
+		</id>
+
+		<property name="Fulfillmentinfodate" column="fulfillmentinfodate"
+			type="date" not-null="true" length="10"/>
+			
+		<property name="Orderdate" column="orderdate"
+			type="date" not-null="false" length="10"/>
+
+		<property name="Ordertype" column="ordertype"
+			type="string" not-null="false" length="16"/>
+
+		<property name="OrderidCustomer" column="orderid_customer"
+			type="string" not-null="false" length="40"/>
+
+		<property name="Remark" column="remark"
+			type="string" not-null="false"/>
+
+		<property name="Partialshipment" column="partialshipment"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="Transport" column="transport"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Specialtreatment" column="specialtreatment"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Internationalrestrictions" column="internationalrestrictions"
+			type="string" not-null="false" length="256" />
+
+		<property name="PricetotalNet" column="pricetotal_net"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="PricetotalGross" column="pricetotal_gross"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Taxtotal" column="taxtotal"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Taxamount" column="taxamount"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Totallineitems" column="totallineitems"
+			type="integer" not-null="false" length="11"/>
+
+		<many-to-one name="Orderref" column="orderref"
+			class="OrderCustomer" not-null="true">
+		</many-to-one>
+		
+		<many-to-one name="Customer" column="customer"
+			class="Customer" not-null="false">
+		</many-to-one>
+
+		<many-to-one name="Currency" column="currency" 
+			class="Currency" not-null="false">
+		</many-to-one>
+
+		<many-to-one name="Invoiceaddress" column="invoiceaddress"
+			class="Address" not-null="false">
+		</many-to-one>
+
+		<many-to-one name="Deliveryaddress" column="deliveryaddress"
+			class="Address" not-null="false">
+		</many-to-one>
+	
+	</class>	
+</hibernate-mapping>

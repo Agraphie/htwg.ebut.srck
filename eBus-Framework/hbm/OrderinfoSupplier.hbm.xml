@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="OrderinfoSupplier"	table="orderinfo_supplier">
+
+		<id name="Id" column="product" type="integer"/>
+	
+	    <many-to-one name="Product" column="materialnumber"
+	        class="Product" not-null="true"/>
+
+		<property name="Orderunit" column="orderunit"
+			type="string" not-null="true" length="16"/>
+
+		<property name="Contentunit" column="contentunit"
+			type="string" not-null="true" length="16"/>
+
+		<property name="NoCuPerOu" column="no_cu_per_ou"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="Minorderquantity" column="minorderquantity"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="Maxorderquantity" column="maxorderquantity"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="Orderquantityinterval" column="orderquantityinterval"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="Deliverydays" column="deliverydays"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="Specialtreatment" column="specialtreatment"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Specialtreatmentclasstype" column="specialtreatmentclasstype"
+			type="string" not-null="false" length="64"/>
+
+	</class>
+</hibernate-mapping>

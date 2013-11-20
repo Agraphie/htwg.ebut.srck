@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="ShipmentCustomer" table="shipment_customer">
+
+		<id	name="Shipmentid" column="shipmentid"
+			type="string">
+			<generator class="assigned"/>
+		</id>
+
+		<property name="Shipmentdate" column="shipmentdate"
+			type="date" not-null="false" length="10"/>
+
+		<property name="Deliverynotedate" column="deliverynotedate"
+			type="date" not-null="false" length="10"/>
+
+		<property name="Dispatchnotificationdate" column="dispatchnotificationdate"
+			type="date" not-null="false" length="10"/>
+
+		<property name="Transport" column="transport"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Packageinfo" column="packageinfo"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Specialtreatment" column="specialtreatment"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Internationalrestrictions" column="internationalrestrictions"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Remark" column="remark"
+			type="string" not-null="false"/>
+
+		<many-to-one name="Customer" column="customer" lazy="false"
+			class="Customer" not-null="false">
+		</many-to-one>
+
+	</class>	
+</hibernate-mapping>

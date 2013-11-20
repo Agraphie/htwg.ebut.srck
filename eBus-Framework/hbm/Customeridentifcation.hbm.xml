@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="Customeridentifcation"	table="customeridentifcation">
+
+		<composite-id name="Id" class="CustomeridentifcationPK">
+			<key-many-to-one name="Customer" column="customer"
+				class="Customer"/>
+
+			<key-property name="companyidenttype" column="companyidenttype"
+				type="string"/>
+		</composite-id>
+
+		<many-to-one name="Customer" column="customer" insert="false" update="false"
+			class="Customer" not-null="false">
+		</many-to-one>
+		
+	</class>
+</hibernate-mapping>

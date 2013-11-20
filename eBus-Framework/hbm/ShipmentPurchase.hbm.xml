@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="ShipmentPurchase" table="shipment_purchase">
+
+		<id name="Id" column="shipmentid"
+          type="string">
+
+			<generator class="org.hibernate.id.Assigned"/>
+		</id>
+
+		<property name="ShipmentidSupplier" column="shipmentid_supplier"
+			type="string" not-null="false" length="40"/>
+
+		<property name="Shipmentdate" column="shipmentdate"
+			type="date" not-null="false" length="10"/>
+
+		<property name="Deliverynotedate" column="deliverynotedate"
+			type="date" not-null="false" length="10"/>
+
+		<property name="Dispatchnotificationdate" column="dispatchnotificationdate"
+			type="date" not-null="false" length="10"/>
+
+		<property name="Supplier" column="supplier"
+			type="string" not-null="false" length="40"/>
+
+		<property name="Transport" column="transport"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Packageinfo" column="packageinfo"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Specialtreatment" column="specialtreatment"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Internationalrestrictions" column="internationalrestrictions"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Remark" column="remark"
+			type="string" not-null="false"/>
+
+	</class>
+</hibernate-mapping>

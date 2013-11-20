@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="Supplier" table="supplier">
+	
+		<id name="suppliernumber" column="suppliernumber"
+			type="string">
+			<generator class="assigned"/>
+		</id>
+
+		<property name="Companyname" column="companyname"
+			type="string" not-null="true" length="255"/>
+
+		<property name="Firstname" column="firstname"
+			type="string" not-null="true" length="255"/>
+
+		<property name="Lastname" column="lastname"
+			type="string" not-null="true" length="255"/>
+
+		<property name="Remark" column="remark"
+			type="string" not-null="false" length="255"/>
+
+        <property name="wsUserName" column="ws_user_name"
+            type="string" not-null="true" length="255"/>
+
+        <property name="wsPassword" column="ws_password"
+            type="string" not-null="true" length="255"/>
+
+        <property name="wsCatalogEndpoint" column="ws_catalog_endpoint"
+        	type="string" not-null="true" length="255"/>
+
+        <property name="wsOrderEndpoint" column="ws_order_endpoint"
+        	type="string" not-null="true" length="255"/>
+	
+		<many-to-one name="Address" column="address" unique="true"
+			class="Address" not-null="true">
+		</many-to-one>
+
+		<set name="Products" inverse="true">
+			<key column="suppliernumber"/>
+			<one-to-many class="Product"/>
+		</set>
+
+		<set name="UserSuppliers" inverse="true">
+			<key column="suppliernumber"/>
+			<one-to-many class="UserSupplier"/>
+		</set>
+
+		<set name="Supplieridentifications" inverse="true">
+			<key column="suppliernumber"/>
+			<one-to-many class="Supplieridentification"/>
+		</set>
+
+	</class>	
+</hibernate-mapping>

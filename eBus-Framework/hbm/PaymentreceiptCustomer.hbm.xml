@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="PaymentreceiptCustomer" table="paymentreceipt_customer">
+
+		<id name="Paymentreceiptnumber" column="paymentreceiptnumber"
+			type="string">
+			<generator class="assigned"/>
+		</id>
+
+		<property name="Paymentreceiptdate"	column="paymentreceiptdate"
+			type="date" not-null="true" length="10"/>
+
+		<property name="Paymenttype" column="paymenttype"
+			type="string" not-null="false" length="32"/>
+
+		<property name="Paymentinformation" column="paymentinformation"
+			type="string" not-null="false" length="512"/>
+
+		<property name="Paymentinfotext" column="paymentinfotext"
+			type="string" not-null="false" length="512"/>
+
+		<property name="Amount" column="amount"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<many-to-one name="Currency" column="currency"
+			class="Currency" not-null="true">
+		</many-to-one>
+		
+		<many-to-one name="Customer" column="customer"
+			class="Customer" not-null="true">
+		</many-to-one>
+
+	</class>	
+</hibernate-mapping>

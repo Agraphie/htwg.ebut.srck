@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="FulfillmentinfoPurchase" table="fulfillmentinfo_purchase">
+
+		<id name="Id" column="fulfillmentinfoid"
+          type="string">
+
+			<generator class="org.hibernate.id.Assigned"/>
+		</id>
+
+		<property name="Fulfillmentinfodate" column="fulfillmentinfodate"
+			type="date" not-null="true" length="10"/>
+
+		<property name="Supplier" column="supplier"
+			type="string" not-null="false" length="40"/>
+
+		<property name="FulfillmentinfoidSupplier" column="fulfillmentinfoid_supplier"
+			type="string" not-null="false" length="40"/>
+
+		<property name="Orderref" column="orderref"
+			type="string" not-null="true" length="40"/>
+
+		<property name="Orderdate" column="orderdate"
+			type="date" not-null="false" length="10"/>
+
+		<property name="Ordertype" column="ordertype"
+			type="string" not-null="false" length="16"/>
+
+		<property name="OrderidSupplier" column="orderid_supplier"
+			type="string" not-null="false" length="40"/>
+
+		<property name="Invoiceaddress" column="invoiceaddress"
+			type="string" not-null="false" length="40"/>
+
+		<property name="Deliveryaddress" column="deliveryaddress"
+			type="string" not-null="false" length="40"/>
+
+		<property name="Currency" column="currency"
+			type="string" not-null="false" length="3"/>
+
+		<property name="Remark" column="remark"
+			type="string" not-null="false"/>
+
+		<property name="Partialshipment" column="partialshipment"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="Transport" column="transport"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Specialtreatment" column="specialtreatment"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Internationalrestrictions" column="internationalrestrictions"
+			type="string" not-null="false" length="256"/>
+
+		<property name="PricetotalNet" column="pricetotal_net"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="PricetotalGross" column="pricetotal_gross"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Taxtotal" column="taxtotal"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Taxamount" column="taxamount"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Totallineitems" column="totallineitems"
+			type="integer" not-null="false" length="11"/>
+
+	</class>
+</hibernate-mapping>

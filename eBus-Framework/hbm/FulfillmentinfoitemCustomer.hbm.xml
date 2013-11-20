@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="FulfillmentinfoitemCustomer" table="fulfillmentinfoitem_customer">
+
+		<composite-id name="Id" class="FulfillmentinfoitemCustomerPK">
+			<key-many-to-one name="Fulfillmentinfo" column="fulfillmentinfo"
+				class="FulfillmentinfoCustomer"/>
+
+			<key-property name="Itemnumber" column="itemnumber"
+				type="integer"/>
+		</composite-id>
+
+		<property name="OrdernumberCustomer" column="ordernumber_customer"
+			type="string" not-null="true" length="40"/>
+
+		<property name="Productdescription" column="productdescription"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Orderamount" column="orderamount"
+			type="integer" not-null="true" length="11"/>
+
+		<property name="Orderunit" column="orderunit"
+			type="string" not-null="true" length="16"/>
+
+		<property name="Contentunit" column="contentunit"
+			type="string" not-null="false" length="16"/>
+
+		<property name="NoCuPerOu" column="no_cu_per_ou"
+			type="integer" not-null="false" length="11"/>
+			
+		<property name="Unitprice" column="unitprice"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Itemprice" column="itemprice"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Pricetype" column="pricetype"
+			type="string" not-null="false" length="16"/>
+
+		<property name="Pricequantity" column="pricequantity"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="Taxrate" column="taxrate"
+			type="big_decimal" not-null="false"	length="4"/>
+
+		<property name="Taxamount" column="taxamount"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Partialshipment" column="partialshipment"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="Transport" column="transport"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Specialtreatment" column="specialtreatment"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Internationalrestrictions" column="internationalrestrictions"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Remark" column="remark"
+			type="string" not-null="false" length="256"/>
+
+		<many-to-one name="Deliveryaddress" column="deliveryaddress"
+			class="Address" not-null="false">
+		</many-to-one>
+
+	</class>
+</hibernate-mapping>

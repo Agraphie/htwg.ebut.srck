@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="Purchaseprice"	table="purchaseprice">
+
+		<composite-id name="Id" class="PurchasepricePK">
+			<key-many-to-one name="Product" column="product"
+				class="Product"/>
+
+			<key-many-to-one name="Country" column="country"
+				class="Country"/>
+
+			<key-property name="LowerboundScaledprice" column="lowerbound_scaledprice"
+				type="integer"/>
+		</composite-id>
+
+		<many-to-one name="Product" column="product" insert="false" update="false" lazy="false"
+			class="Product"/>
+
+		<many-to-one name="Country"	column="country" insert="false" update="false" lazy="false"
+			class="Country"/>
+
+		<property name="LowerboundScaledprice" type="integer" insert="false" update="false"
+			column="lowerbound_scaledprice"/>
+
+		<property name="Priceunit" column="priceunit"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="Pricetype" column="pricetype"
+			type="string" not-null="true" length="16"/>
+
+		<property name="Taxrate" column="taxrate"
+			type="big_decimal" not-null="true" length="4"/>
+
+		<property name="Amount" column="amount"
+			type="big_decimal" not-null="true" length="10"/>
+
+		<property name="Remark" column="remark" 
+			type="string" not-null="false" length="256"/>
+
+	</class>	
+</hibernate-mapping>

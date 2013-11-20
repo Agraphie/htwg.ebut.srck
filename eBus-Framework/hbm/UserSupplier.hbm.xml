@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="UserSupplier" table="user_supplier">
+
+		<id name="Id" column="id"
+			type="integer">
+			<generator class="increment"/>
+		</id>
+
+		<property name="Lastname" column="lastname"
+			type="string" not-null="true" length="255"/>
+
+		<property name="Firstname" column="firstname"
+			type="string" not-null="false" length="255"/>
+
+		<property name="Title" column="title"
+			type="string" not-null="false" length="64"/>
+
+		<property name="Email" column="email"
+			type="string" not-null="false" length="255"/>
+
+		<property name="Phonenumber" column="phonenumber"
+			type="string" not-null="false" length="255"/>
+
+		<property name="Mobilenumber" column="mobilenumber"
+			type="string" not-null="false" length="255"/>
+
+		<property name="Faxnumber" column="faxnumber"
+			type="string" not-null="false" length="255"/>
+
+		<property name="Login" column="login"
+			type="string" not-null="false" length="10"/>
+
+		<property name="Passwd"	column="passwd"
+			type="string" not-null="false" length="16"/>
+
+		<property name="Remark" column="remark"
+			type="string" not-null="false" length="255"/>
+
+		<many-to-one name="Supplier" column="supplier"
+			class="Supplier" not-null="true">
+		</many-to-one>
+		
+		<many-to-one name="Address" column="address" unique="true"
+			class="Address" not-null="false">
+		</many-to-one>
+
+	</class>	
+</hibernate-mapping>

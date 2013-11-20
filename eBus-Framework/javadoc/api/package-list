@@ -1,0 +1,9 @@
+de.htwg_konstanz.ebus.framework.wholesaler.api.bo
+de.htwg_konstanz.ebus.framework.wholesaler.api.boa
+de.htwg_konstanz.ebus.framework.wholesaler.api.security
+de.htwg_konstanz.ebus.framework.wholesaler.test
+de.htwg_konstanz.ebus.framework.wholesaler.vo
+de.htwg_konstanz.ebus.framework.wholesaler.vo.base
+de.htwg_konstanz.ebus.framework.wholesaler.vo.util
+de.htwg_konstanz.ebus.framework.wholesaler.vo.voa
+de.htwg_konstanz.ebus.framework.wholesaler.vo.voa.iface

@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="Customer" table="customer">
+		
+		<id name="customerid" column="customerid"
+			type="string">
+			<generator class="assigned"/>
+		</id>
+
+		<property name="Companyname" column="companyname"
+			type="string" not-null="true" length="255"/>
+
+		<property name="Firstname" column="firstname"
+			type="string" not-null="true" length="255"/>
+
+		<property name="Lastname" column="lastname"
+			type="string" not-null="true" length="255"/>
+
+		<property name="Remark" column="remark"
+			type="string" not-null="false" length="255"/>
+
+        <property name="wsUserName" column="ws_user_name"
+            type="string" not-null="true" length="255"/>
+
+        <property name="wsPassword" column="ws_password"
+            type="string" not-null="true" length="255"/>
+
+        <property name="wsDeliveryEndpoint" column="ws_delivery_endpoint"
+        	type="string" not-null="true" length="255"/>
+
+        <property name="wsInvoiceEndpoint" column="ws_invoice_endpoint"
+        	type="string" not-null="true" length="255"/>
+
+		<many-to-one name="Address" column="address"
+			class="Address"	not-null="true" unique="true">
+		</many-to-one>
+	
+	</class>	
+</hibernate-mapping>

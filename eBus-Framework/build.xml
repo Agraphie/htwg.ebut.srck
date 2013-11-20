@@ -1,0 +1,254 @@
+<project name="eBus-Framework" default="jar" basedir=".">
+    
+  <!-- =================================================================== -->
+  <!-- Compiler Options                                                    -->
+  <!-- =================================================================== -->
+  <!-- Should Java compilations set the 'debug' compiler option? -->
+  <property name="compile.debug" value="true"/>
+  <!-- Should Java compilations set the 'deprecation' compiler option? -->
+  <property name="compile.deprecation" value="true"/>
+  <!-- Should Java compilations set the 'optimize' compiler option? -->
+  <property name="compile.optimize" value="true"/>
+  <!-- Should Java compilations set the 'optimize' compiler option? -->
+  <property name="compile.target" value="1.5"/>
+  
+  <!-- =================================================================== -->
+  <!-- Project Properties                                                  -->
+  <!-- =================================================================== -->
+  <property name="name" value="eBus-Framework"/>
+  <property name="year" value="2011"/>
+  <property name="_version" value="1.0.5"/>
+  <property name="project" value="eBus-Framework"/>
+  <property name="jar.name" value="${project}-${_version}"/>
+  <property name="final.name" value="${project}-bin-${_version}"/>
+  <property name="final-src.name" value="${project}-src-${_version}"/>
+  <property name="final-doc.name" value="${project}-doc-${_version}"/>
+  <property name="framework.dir" value="${project}_${_version}"/>
+  <property name="framework.tmp.dir" value ="frameworktmp"/>
+  <property name="dist.dir" value ="${basedir}/dist"/>
+  <property name="classes.dir" value ="${basedir}/classes"/>
+  <property name="src.dir" value ="${basedir}/src"/>
+  <property name="test.dir" value ="${basedir}/test"/>
+  <property name="javadoc.dir" value ="${basedir}/javadoc/api"/>
+  <property name="install.dir" value ="${basedir}/install"/>
+  <property name="config.dir" value ="${basedir}/config"/>
+  <property name="lib.dir" value ="${basedir}/lib"/>
+  <property name="dot.dir" value ="${basedir}/../graphviz-2.12/bin"/>
+  <property name="style.dir" value ="${basedir}/javadoc/res"/>
+  <property file="${config.dir}/db.properties"/> 
+  
+  <!-- =================================================================== -->
+  <!-- eBus-Framework build                                                -->
+  <!-- =================================================================== -->
+  <target name="build">
+    <echo message="Starting eBus-Framework build"/>
+
+    <mkdir dir="${classes.dir}"/>
+    
+    <javac srcdir="${src.dir}"
+           destdir="${classes.dir}"
+           classpath="${basedir}/lib/hibernate3.jar;${basedir}/lib/junit-4.8.2.jar"
+           debug="on"/>
+
+    <copy todir="${classes.dir}">
+        <fileset dir="${basedir}/hbm" includes="*"/>
+    </copy>
+
+    <copy todir="${classes.dir}">
+        <fileset dir="${basedir}/config" includes="*"/>
+    </copy>
+  </target>
+  
+  <!-- =================================================================== -->
+  <!-- eBus-Framework SourceCode                                           -->
+  <!-- =================================================================== -->
+  <target name="src">
+    <echo message="Starting eBus-Framework source build"/>
+
+    <mkdir dir="${dist.dir}"/>
+    <mkdir dir="${framework.tmp.dir}/${final-src.name}"/>
+    <mkdir dir="${framework.tmp.dir}/${final-src.name}/src"/>
+    <mkdir dir="${framework.tmp.dir}/${final-src.name}/hbm"/>
+    <mkdir dir="${framework.tmp.dir}/${final-src.name}/doc"/>
+    <mkdir dir="${framework.tmp.dir}/${final-src.name}/doc/api"/>
+    <mkdir dir="${framework.tmp.dir}/${final-src.name}/doc/test"/>
+    
+    <copy todir="${framework.tmp.dir}/${final-src.name}/src">
+        <fileset dir="${basedir}/src" includes="**/*"/>
+    </copy>
+    
+    <copy todir="${framework.tmp.dir}/${final-src.name}/hbm">
+        <fileset dir="${basedir}/hbm" includes="*"/>
+    </copy>
+
+    <copy todir="${framework.tmp.dir}/${final-src.name}/config">
+        <fileset dir="${basedir}/config" includes="*"/>
+    </copy>
+
+    <copy todir="${framework.tmp.dir}/${final-src.name}/doc/standard/api">
+        <fileset dir="${javadoc.dir}" includes="**/*"/>
+    </copy>
+
+    <copy todir="${framework.tmp.dir}/${final-src.name}/doc/uml/api">
+        <fileset dir="${umldoc.dir}" includes="**/*"/>
+    </copy>
+
+    <copy todir="${framework.tmp.dir}/${final-src.name}/doc/test">
+        <fileset dir="${test.dir}" includes="**/*"/>
+    </copy>
+
+    <!-- ZIP to create the final source archive -->
+    <zip zipfile="${dist.dir}/${final-src.name}.zip" compress="true" 
+       basedir="${framework.tmp.dir}"/>
+       
+    <delete dir="${framework.tmp.dir}"/>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- eBus-Framework Doc Distribution                                     -->
+  <!-- =================================================================== -->
+  <target name="dist-doc">
+    <echo message="Starting eBus-Framework Doc Distribution"/>
+
+    <mkdir dir="${dist.dir}"/>
+    <mkdir dir="${framework.tmp.dir}/${final-doc.name}"/>
+    <mkdir dir="${framework.tmp.dir}/${final-doc.name}/doc/api"/>
+    <mkdir dir="${framework.tmp.dir}/${final-doc.name}/doc/test"/>
+    
+    <copy todir="${framework.tmp.dir}/${final-doc.name}/doc/api">
+        <fileset dir="${javadoc.dir}" includes="**/*"/>
+    </copy>
+
+    <copy todir="${framework.tmp.dir}/${final-doc.name}/doc/test">
+        <fileset dir="${test.dir}" includes="**/*"/>
+    </copy>
+
+    <!-- ZIP to create the final doc archive -->
+    <zip zipfile="${dist.dir}/${final-doc.name}.zip" compress="true" 
+       basedir="${framework.tmp.dir}"/>
+       
+    <delete dir="${framework.tmp.dir}"/>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Jar-File of the ebus framework                                      -->
+  <!-- =================================================================== -->
+  <target name="jar" depends="build">
+    <echo message="Starting eBus-Framework jar build"/>
+
+    <mkdir dir="${dist.dir}"/>
+    
+    <jar jarfile="${dist.dir}/${jar.name}.jar" basedir="${classes.dir}" includes="**/*.class *.hbm.xml hibernate.cfg.xml" />
+  </target>
+    
+  <!-- =================================================================== -->
+  <!-- JUnit test runs.                                                    -->
+  <!--                                                                     -->
+  <!-- Requirements:                                                       -->  
+  <!-- **************                                                      -->
+  <!-- 1. running mysql server                                             --> 
+  <!-- 2. wholesaler database with initial data                            -->
+  <!-- 3. change hibernate.cfg.xml to your settings              -->
+  <!-- =================================================================== -->
+  <target name="test" depends="build">
+    <echo message="Starting eBus-Framework test runs"/>
+
+    <mkdir dir="${test.dir}"/>
+
+    <junit fork="yes" printsummary="no" haltonfailure="no">
+			<classpath>
+      	<fileset dir="${lib.dir}">
+        	<include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${basedir}/../dev/lib">
+          <include name="**/*.jar"/>
+        </fileset>
+        <pathelement path="${classpath}"/>
+        <pathelement location="${classes.dir}"/>
+        <pathelement location="${basedir}/hbm"/>
+        <pathelement location="${basedir}/config"/>
+      </classpath>
+
+      <formatter type="xml"/>
+
+      <batchtest fork="yes" todir="${test.dir}">
+        <fileset dir="${src.dir}">
+            <include name="**/*Test*.java"/>
+            <exclude name="**/AllTests.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+
+    <junitreport todir="${test.dir}">
+      <fileset dir="${test.dir}">
+          <include name="TEST-*.xml" />
+      </fileset>
+      <report todir="${test.dir}" />
+    </junitreport>
+  </target>   
+
+  <!-- =================================================================== -->
+  <!-- Generate standard javadoc                                           -->
+  <!-- =================================================================== -->
+  <target name="javadoc">
+    <echo message="Starting eBus-Framework standard javadoc generation"/>
+
+    <mkdir dir="${javadoc.dir}"/>
+
+    <javadoc destdir="${javadoc.dir}"
+             author="true"
+             version="true"
+             use="true"
+             windowtitle="eBus-Framework API"
+             stylesheetfile="${style.dir}/stylesheet.css"
+    		 classpath="${lib.dir}/junit-4.8.2.jar">
+      
+        <packageset dir="${src.dir}" defaultexcludes="yes">
+            <include name="de/htwg_konstanz/ebus/framework/wholesaler/**"/>
+        </packageset>
+
+        <group title="API Packages" packages="de.htwg_konstanz.ebus.framework.wholesaler.api*"/>
+        <group title="Hibernate Abstraction Packages" packages="de.htwg_konstanz.ebus.framework.wholesaler.vo*"/>
+        <group title="Test Packages" packages="de.htwg_konstanz.ebus.framework.wholesaler.test*"/>
+        <doctitle><![CDATA[<h1>eBus-Framework API</h1>]]></doctitle>
+        <bottom><![CDATA[<i>Copyright &#169; 2006-2011 HTWG Konstanz. <br>Fakultaet Informatik - Department of Computer Science <br>E-Business Technologien <br>Prof. Dr.-Ing. Juergen Waesch <br>Dipl. -Inf. (FH) Thomas Dietrich</i>]]></bottom>
+        <tag name="todo" scope="all" description="To do:"/>
+        <link offline="true" href="http://java.sun.com/products/jdk/1.2/docs/api/" packagelistLoc="C:\tmp"/>
+        <link href="http://developer.java.sun.com/developer/products/xml/docs/api/"/>
+    </javadoc>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- create example db                                                   -->
+  <!-- =================================================================== -->
+  <target name="create-db">
+  	<echo message="Starting eBus-Framework example database table generation"/>
+    
+    <input message="All data is going to be deleted from DB continue (y/n)?"
+           validargs="y,n"
+           addproperty="do.delete" />
+      
+    <condition property="do.abort">
+      <equals arg1="n" arg2="${do.delete}"/>
+    </condition>
+      
+    <fail if="do.abort">Build aborted by user.</fail>
+
+    <exec dir="${install.dir}" executable="${install.dir}/createdb.bat">
+      <arg line="${db.name} ${db.user} ${db.passwd}"/>
+    </exec> 
+  </target>
+    
+  <!-- =================================================================== -->
+  <!-- config hibernate properties                                         -->
+  <!-- =================================================================== -->
+  <target name="config">
+    <copy file="${config.dir}/hibernate.cfg.template_do_not_delete" tofile="${config.dir}/hibernate.cfg.xml" overwrite="true"/>
+    <replace file="${config.dir}/hibernate.cfg.xml" token="@db.name@" value="${db.name}"/>    
+    <replace file="${config.dir}/hibernate.cfg.xml" token="@db.user@" value="${db.user}"/>    
+    <replace file="${config.dir}/hibernate.cfg.xml" token="@db.passwd@" value="${db.passwd}"/>    
+  </target> 
+  
+</project>
+
+

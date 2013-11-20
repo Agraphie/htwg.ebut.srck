@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="OrderPurchase" table="order_purchase">
+
+		<id name="Orderid" column="orderid"
+          	type="string">
+			<generator class="assigned"/>
+		</id>
+
+		<property name="Orderdate" column="orderdate"
+			type="timestamp" not-null="true" length="10"/>
+
+		<property name="Ordertype" column="ordertype"
+			type="string" not-null="false" length="16"/>
+
+		<property name="OrderidSupplier" column="orderid_supplier"
+			type="string" not-null="false" length="40"/>
+
+		<property name="Remark" column="remark"
+			type="string" not-null="false"/>
+
+		<property name="Partialshipment" column="partialshipment"
+			type="integer" not-null="false" length="1"/>
+
+		<property name="Transport" column="transport"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Specialtreatment" column="specialtreatment"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Internationalrestrictions" column="internationalrestrictions"
+			type="string" not-null="false" length="256"/>
+
+		<property name="PricetotalNet" column="pricetotal_net"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="PricetotalGross" column="pricetotal_gross"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Taxtotal" column="taxtotal"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Taxamount" column="taxamount"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Totallineitems" column="totallineitems"
+			type="integer" not-null="true" length="11"/>
+
+        <property name="xmlFileRequest" column="xml_file_request" 
+        	type="binary" not-null="false"/>
+
+        <property name="xmlFileResponse" column="xml_file_response" 
+        	type="binary" not-null="false"/>
+
+        <property name="rejected" column="is_rejected"
+            type="boolean" not-null="true"/>
+
+		<many-to-one name="Supplier" column="supplier" lazy="false"
+			class="Supplier" not-null="false">
+		</many-to-one>
+			
+		<many-to-one name="Currency" column="currency" lazy="false"
+			class="Currency" not-null="false">
+		</many-to-one>
+
+		<many-to-one name="Invoiceaddress" column="invoiceaddress" lazy="false"
+			class="Address" not-null="false">
+		</many-to-one>
+		
+		<many-to-one name="Deliveryaddress" column="deliveryaddress" lazy="false"
+			class="Address" not-null="false">
+		</many-to-one>
+
+		<set name="OrderItems" inverse="true" lazy="false">
+			<key column="orderref"/>
+			<one-to-many class="OrderitemPurchase"/>
+		</set>			
+
+	</class>
+</hibernate-mapping>

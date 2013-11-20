@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="RequestforquotationCustomer" table="requestforquotation_customer">
+
+		<id name="Id" column="rfqid"
+          type="string">
+
+			<generator class="org.hibernate.id.Assigned"/>
+		</id>
+
+		<property name="Customer" column="customer"
+			type="string" not-null="true" length="40"/>
+
+		<property name="Rfqdate" column="rfqdate"
+			type="date" not-null="true" length="10"/>
+
+		<property name="Rfqtype" column="rfqtype"
+			type="string" not-null="false" length="16"/>
+
+		<property name="RfqidCustomer" column="rfqid_customer"
+			type="string" not-null="false" length="40"/>
+
+		<property name="Invoiceaddress" column="invoiceaddress"
+			type="string" not-null="false" length="40"/>
+
+		<property name="Deliveryaddress" column="deliveryaddress"
+			type="string" not-null="false" length="40"/>
+
+		<property name="Currency" column="currency"
+			type="string" not-null="false" length="3"/>
+
+		<property name="Remark" column="remark"
+			type="string" not-null="false"/>
+
+		<property name="Partialshipment" column="partialshipment"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="Transport" column="transport"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Specialtreatment" column="specialtreatment"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Internationalrestrictions" column="internationalrestrictions"
+			type="string" not-null="false" length="256"/>
+
+		<property name="PricetotalNet" column="pricetotal_net"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="PricetotalGross" column="pricetotal_gross"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Taxtotal" column="taxtotal"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Taxamount" column="taxamount"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Totallineitems" column="totallineitems"
+			type="integer" not-null="false" length="11"/>
+
+	</class>
+</hibernate-mapping>

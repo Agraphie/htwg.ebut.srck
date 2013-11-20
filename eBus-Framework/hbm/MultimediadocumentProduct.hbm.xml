@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="MultimediadocumentProduct" table="multimediadocument_product" check="isuri in (0, 1)">
+
+		<id name="Id" column="id"
+			type="integer">
+			<generator class="increment"/>
+		</id>
+
+		<property name="Mimetype" column="mimetype"
+			type="string" not-null="true" length="32"/>
+
+		<property name="UrlOrRelativefilepath" column="url_or_relativefilepath"
+			type="string" not-null="true" length="512"/>
+		
+		<property name="Isuri" column="isuri" 
+			type="integer" not-null="false" length="1"/>
+		
+		<property name="Purpose" column="purpose"
+			type="string" not-null="true" length="32"/>
+
+		<property name="Description" column="description"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Remark" column="remark"
+			type="string" not-null="false" length="256"/>
+
+		<many-to-one name="Product" column="product"
+			class="Product" not-null="true">
+		</many-to-one>
+
+	</class>	
+</hibernate-mapping>

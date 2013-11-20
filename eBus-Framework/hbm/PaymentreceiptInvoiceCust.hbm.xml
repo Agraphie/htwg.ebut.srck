@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="PaymentreceiptInvoiceCust"	table="paymentreceipt_invoice_cust">
+
+		<composite-id name="Id" class="PaymentreceiptInvoiceCustPK">
+			<key-many-to-one name="PaymentreceiptCustomer" column="paymentreceipt"
+				class="PaymentreceiptCustomer"/>
+
+			<key-many-to-one name="InvoiceitemCustomer" class="InvoiceitemCustomer">
+				<column name="invoice" />
+			 	<column name="invoiceitem" />
+			</key-many-to-one>
+		
+			<key-property name="Partialpaymentnumber" column="partialpaymentnumber"
+				type="integer"/>
+		</composite-id>
+
+		<property name="Paymentreceipt" column="paymentreceipt" insert="false" update="false"
+			type="string" not-null="true" length="40"/>
+
+		<property name="Invoice" column="invoice" insert="false" update="false"
+			type="string" not-null="true" length="40"/>
+
+		<property name="Invoiceitem" column="invoiceitem" insert="false" update="false"
+			type="integer" not-null="true" length="11"/>
+
+	</class>
+</hibernate-mapping>

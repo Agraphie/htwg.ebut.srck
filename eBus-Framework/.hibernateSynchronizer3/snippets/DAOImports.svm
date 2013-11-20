@@ -1,0 +1,8 @@
+:Modified=true
+:Description=
+-
+import org.hibernate.Session;
+
+import org.hibernate.Criteria;
+
+import ${class.AbsoluteBaseDAOClassName};

@@ -1,0 +1,12 @@
+:Modified=true
+:Description=
+-
+ 	/**
+	 * Perform a filtered search.
+	 */
+	public Criteria findFiltered(String propName, Object filter)#if ($exceptionClass) throws ${exceptionClass}#end;
+
+ 	/**
+	 * Perform a filtered (with joker signs) search.
+	 */
+	public Criteria findFilteredLike(String propName, Object filter)#if ($exceptionClass) throws ${exceptionClass}#end;

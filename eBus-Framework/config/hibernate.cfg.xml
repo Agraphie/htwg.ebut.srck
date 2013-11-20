@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration
+    PUBLIC "-//Hibernate/Hibernate Configuration DTD//EN"
+    "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+	<session-factory>
+		<property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+		<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/ebus</property>
+		<property name="hibernate.connection.username">manager</property>
+		<property name="hibernate.connection.password">manager</property>
+
+		<!-- dialect for MySQL -->
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+         
+	    <property name="hibernate.show.sql">false</property>
+      	<property name="hibernate.generate_statistics">false</property>
+        
+        <mapping resource="ActiveconfigInternal.hbm.xml" />
+        <mapping resource="Address.hbm.xml" />
+        <mapping resource="Articlenumber.hbm.xml" />
+        <mapping resource="Articlenumbertype.hbm.xml" />
+        <mapping resource="Companyidenttype.hbm.xml" />
+        <mapping resource="ConfigInternal.hbm.xml" />
+        <mapping resource="Contentunit.hbm.xml" />
+        <mapping resource="Country.hbm.xml" />
+        <mapping resource="Currency.hbm.xml" />
+        <mapping resource="Customer.hbm.xml" />
+        <mapping resource="Customeridentifcation.hbm.xml" /> 
+        <mapping resource="FulfillmentinfoCustomer.hbm.xml" />
+        <mapping resource="FulfillmentinfoitemCustomer.hbm.xml" />
+        <mapping resource="FulfillmentShipmentCustomer.hbm.xml" />
+        <mapping resource="InvoiceCustomer.hbm.xml" />
+        <mapping resource="InvoiceitemCustomer.hbm.xml" />
+        <mapping resource="InvoiceShipmentCustomer.hbm.xml" />
+        <mapping resource="Mimepurpose.hbm.xml" />
+        <mapping resource="Mimetype.hbm.xml" />
+        <mapping resource="MultimediadocumentProduct.hbm.xml" />
+        <mapping resource="OrderCustomer.hbm.xml" />
+        <mapping resource="OrderinfoCustomer.hbm.xml" />
+        <mapping resource="OrderinfoSupplier.hbm.xml" />
+        <mapping resource="OrderitemCustomer.hbm.xml" />
+        <mapping resource="Ordertype.hbm.xml" />
+        <mapping resource="Orderunit.hbm.xml" />
+        <mapping resource="PaymentreceiptCustomer.hbm.xml" />
+        <mapping resource="PaymentreceiptInvoiceCust.hbm.xml" /> 
+        <mapping resource="Paymenttype.hbm.xml" />
+        <mapping resource="Pricetype.hbm.xml" />
+        <mapping resource="Product.hbm.xml" />
+        <mapping resource="Productcategory.hbm.xml" />
+        <mapping resource="Productreference.hbm.xml" />
+        <mapping resource="Productstatus.hbm.xml" />
+        <mapping resource="Producttype.hbm.xml" />
+        <mapping resource="Purchaseprice.hbm.xml" />
+        <mapping resource="Referencetype.hbm.xml" />
+        <mapping resource="Salesprice.hbm.xml" />
+        <mapping resource="ShipmentCustomer.hbm.xml" />
+        <mapping resource="ShipmentitemCustomer.hbm.xml" />
+        <mapping resource="Supplier.hbm.xml" />
+        <mapping resource="Supplieridentification.hbm.xml" />
+        <mapping resource="UserCustomer.hbm.xml" />
+        <mapping resource="UserInternal.hbm.xml" />
+        <mapping resource="UserSupplier.hbm.xml" />
+        <mapping resource="Inventory.hbm.xml" />
+        
+        <mapping resource="FulfillmentinfoitemPurchase.hbm.xml" />
+        <mapping resource="FulfillmentinfoPurchase.hbm.xml" />
+        <mapping resource="FulfillmentShipmentPurchase.hbm.xml" />
+        <mapping resource="InvoiceitemPurchase.hbm.xml" />
+        <mapping resource="InvoicePurchase.hbm.xml" />
+        <mapping resource="InvoiceShipmentPurchase.hbm.xml" />
+        <mapping resource="OrderitemPurchase.hbm.xml" />
+        <mapping resource="OrderPurchase.hbm.xml" />
+        <mapping resource="PaymentInvoicePurchase.hbm.xml" />
+        <mapping resource="PaymentPurchase.hbm.xml" />
+        <mapping resource="RequestforquotationCustomer.hbm.xml" />
+        <mapping resource="ShipmentitemPurchase.hbm.xml" />
+        <mapping resource="ShipmentPurchase.hbm.xml" /> 
+
+        <mapping resource="AllUsers.hbm.xml" />
+	</session-factory>
+</hibernate-configuration>

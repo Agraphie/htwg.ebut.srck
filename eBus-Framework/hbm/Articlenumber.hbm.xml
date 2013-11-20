@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="Articlenumber" table="articlenumber">
+
+		<composite-id name="Id" class="ArticlenumberPK">
+			<key-many-to-one name="Product" column="product" 
+				class="Product"/>
+				
+			<key-many-to-one name="Articlenumbertype" column="articlenumbertype"
+				class="Articlenumbertype"/>
+		</composite-id>
+
+		<property name="Anumber" column="anumber"
+			type="string" not-null="true" length="64"/>
+
+	</class>	
+</hibernate-mapping>

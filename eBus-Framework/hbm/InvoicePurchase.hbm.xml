@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="InvoicePurchase" table="invoice_purchase">
+
+		<id name="Id" column="invoiceid"
+          type="string">
+
+			<generator class="org.hibernate.id.Assigned"/>
+		</id>
+
+		<property name="Invoicedate" column="invoicedate"
+			type="date" not-null="true" length="10"/>
+
+		<property name="InvoiceidSupplier" column="invoiceid_supplier"
+			type="string" not-null="false" length="40"/>
+
+		<property name="Supplier" column="supplier"
+			type="string" not-null="false" length="40"/>
+
+		<property name="Invoiceaddress" column="invoiceaddress"
+			type="string" not-null="false" length="40"/>
+
+		<property name="Currency" column="currency"
+			type="string" not-null="false" length="3"/>
+
+		<property name="Remark" column="remark"
+			type="string" not-null="false"/>
+
+		<property name="PricetotalNet" column="pricetotal_net"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="PricetotalGross" column="pricetotal_gross"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Taxtotal" column="taxtotal"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Taxamount" column="taxamount"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Totallineitems" column="totallineitems"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="Paymenttype" column="paymenttype"
+			type="string" not-null="false" length="32"/>
+
+		<property name="Paymentinformation" column="paymentinformation"
+			type="string" not-null="false" length="512"/>
+
+	</class>
+</hibernate-mapping>

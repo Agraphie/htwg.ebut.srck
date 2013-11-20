@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="InvoiceitemPurchase" table="invoiceitem_purchase">
+
+		<composite-id name="Id" class="InvoiceitemPurchasePK">
+			<key-property name="Itemnumber" column="itemnumber"
+				type="integer" />
+			<key-property name="Invoice" column="invoice"
+				type="string" />
+		</composite-id>
+
+		<property name="Orderref" column="orderref"
+			type="string" not-null="true" length="40"/>
+
+		<property name="Fulfillmentref" column="fulfillmentref"
+			type="string" not-null="true" length="40"/>
+
+		<property name="Shipmentref" column="shipmentref"
+			type="string" not-null="true" length="40"/>
+
+		<property name="OrdernumberSupplier" column="ordernumber_supplier"
+			type="string" not-null="true" length="40"/>
+
+		<property name="Productdescription" column="productdescription"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Orderamount" column="orderamount"
+			type="integer" not-null="true" length="11"/>
+
+		<property name="Orderunit" column="orderunit"
+			type="string" not-null="true" length="16"/>
+
+		<property name="Contentunit" column="contentunit"
+			type="string" not-null="false" length="16"/>
+
+		<property name="NoCuPerOu" column="no_cu_per_ou"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="Unitprice" column="unitprice"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Itemprice" column="itemprice"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Pricetype" column="pricetype"
+			type="string" not-null="false" length="16"/>
+
+		<property name="Pricequantity" column="pricequantity"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="Taxrate" column="taxrate"
+			type="big_decimal" not-null="false" length="4"/>
+
+		<property name="Taxamount" column="taxamount"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Deliveryaddress" column="deliveryaddress"
+			type="string" not-null="false" length="40"/>
+
+		<property name="Partialshipment" column="partialshipment"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="Transport" column="transport"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Specialtreatment" column="specialtreatment"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Internationalrestrictions" column="internationalrestrictions"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Remark" column="remark"
+			type="string" not-null="false" length="256"/>
+
+	</class>
+</hibernate-mapping>

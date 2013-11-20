@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="ShipmentitemPurchase" table="shipmentitem_purchase">
+
+		<composite-id name="Id" class="ShipmentitemPurchasePK">
+			<key-property name="Shipment" column="shipment"
+				type="string" />
+			<key-property name="Itemnumber" column="itemnumber"
+				type="integer" />
+		</composite-id>
+
+		<property name="OrdernumberSupplier" column="ordernumber_supplier"
+			type="string" not-null="true" length="40"/>
+
+		<property name="Productdescription" column="productdescription"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Shipmentquantity" column="shipmentquantity"
+			type="integer" not-null="true" length="11"/>
+
+		<property name="Orderunit" column="orderunit"
+			type="string" not-null="true" length="16"/>
+
+		<property name="Contentunit" column="contentunit"
+			type="string" not-null="false" length="16"/>
+
+		<property name="NoCuPerOu" column="no_cu_per_ou"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="Deliveryaddress" column="deliveryaddress"
+			type="string" not-null="false" length="40"/>
+
+		<property name="Partialshipment" column="partialshipment"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="Transport" column="transport"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Specialtreatment" column="specialtreatment"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Internationalrestrictions" column="internationalrestrictions"
+			type="string" not-null="false" length="256"/>
+
+		<property name="Remark" column="remark"
+			type="string" not-null="false" length="256"/>
+
+	</class>
+</hibernate-mapping>

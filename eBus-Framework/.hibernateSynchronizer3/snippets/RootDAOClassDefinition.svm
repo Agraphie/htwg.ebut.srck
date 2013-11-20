@@ -1,0 +1,4 @@
+:Modified=true
+:Description=
+-
+public abstract class _RootVOA extends ${class.AbsoluteBaseRootDAOClassName} {

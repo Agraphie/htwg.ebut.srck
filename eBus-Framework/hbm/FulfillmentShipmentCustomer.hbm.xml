@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="FulfillmentShipmentCustomer" table="fulfillment_shipment_customer">
+
+		<composite-id>
+			<key-many-to-one name="Shipment" column="shipment"
+				class="ShipmentCustomer"/>
+
+			<key-many-to-one name="Fulfillmentinfo"	column="fulfillmentinfo"
+				class="FulfillmentinfoCustomer"/>
+		</composite-id>
+
+	</class>	
+</hibernate-mapping>

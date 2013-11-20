@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="Articlenumbertype"	table="articlenumbertype">
+	
+		<id name="articlenumbertype" column="articlenumbertype"
+			type="string">
+			<generator class="assigned"/>
+		</id>
+
+		<property name="Description" column="description"
+			type="string" not-null="true" length="256"/>
+	
+		<set name="Products" table="articlenumber" cascade="all">
+			<key column="articlenumbertype"/>
+			<many-to-many column="product" class="Product"/>
+		</set>
+	
+	</class>	
+</hibernate-mapping>

@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="PaymentPurchase" table="payment_purchase">
+
+		<id name="Id" column="paymentnumber"
+          type="string">
+
+			<generator class="org.hibernate.id.Assigned"/>
+		</id>
+
+		<property name="Paymentdate" column="paymentdate"
+			type="date" not-null="true" length="10"/>
+
+		<property name="Paymenttype" column="paymenttype"
+			type="string" not-null="false" length="32"/>
+
+		<property name="Paymentinformation" column="paymentinformation"
+			type="string" not-null="false" length="512"/>
+
+		<property name="Paymentinfotext" column="paymentinfotext"
+			type="string" not-null="false" length="512"/>
+
+		<property name="Supplier" column="supplier"
+			type="string" not-null="true" length="40"/>
+
+		<property name="Amount" column="amount"
+			type="big_decimal" not-null="false" length="10"/>
+
+		<property name="Currency" column="currency"
+			type="string" not-null="true" length="3"/>
+
+	</class>
+</hibernate-mapping>

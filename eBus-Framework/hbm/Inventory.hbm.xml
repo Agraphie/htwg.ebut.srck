@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="de.htwg_konstanz.ebus.framework.wholesaler.vo">
+	<class name="Inventory" table="inventory">
+
+		<id name="Product" column="product" type="integer">
+        	<generator class="assigned">
+            	<param name="property">MaterialNumber</param>
+        	</generator>
+	    </id>
+
+		<property name="Inventory" column="inventory"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="ThresholdReorder" column="threshold_reorder"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="NumberToReorder" column="number_to_reorder"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="Nonphysicaldelivery" column="nonphysicaldelivery"
+			type="integer" not-null="false" length="11"/>
+
+		<property name="RelativepathDigitalproduct" column="relativepath_digitalproduct"
+			type="string" not-null="false" length="512"/>
+
+	</class>
+</hibernate-mapping>
