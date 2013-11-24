@@ -72,9 +72,6 @@ public class ControllerServlet extends HttpServlet
 	{
 		// load all classes (actions) which implement the IAction interface 
 		actionList = (ArrayList<IAction>)ClassFinderUtil.findAll("de.htwg_konstanz.ebus.wholesaler.demo", IAction.class);
-		
-		//appends action classes from package de.htwg_konstanz.wholesaler.action
-		actionList.addAll((ArrayList<IAction>)ClassFinderUtil.findAll("de.htwg_konstanz.ebus.wholesaler.action", IAction.class));
 	}
 
 	/** 
