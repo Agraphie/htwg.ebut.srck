@@ -1,4 +1,3 @@
-/de
 /ActiveconfigInternal.hbm.xml
 /Address.hbm.xml
 /AllUsers.hbm.xml
@@ -61,5 +60,6 @@
 /UserInternal.hbm.xml
 /UserSupplier.hbm.xml
 /db.properties
+/de
 /hibernate.cfg.template_do_not_delete
 /hibernate.cfg.xml
