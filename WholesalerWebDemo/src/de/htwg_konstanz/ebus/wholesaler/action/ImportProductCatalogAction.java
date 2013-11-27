@@ -19,6 +19,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -26,8 +29,11 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.FileCleanerCleanup;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileCleaningTracker;
+import org.dom4j.XPath;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 
@@ -118,6 +124,8 @@ public class ImportProductCatalogAction implements IAction {
 					dbfactory.setIgnoringComments(true);
 					dbfactory.setXIncludeAware(false);
 					
+					//get XPath factory
+					XPathFactory xpFactory = XPathFactory.newInstance();		
 					
 					try {
 						xmlBuilder = dbfactory.newDocumentBuilder();
@@ -130,16 +138,19 @@ public class ImportProductCatalogAction implements IAction {
 					xmlBuilder.setErrorHandler(new org.xml.sax.helpers.DefaultHandler());
 					xmlBuilder.setEntityResolver(null);
 					
+					//koennte null sein
+					Document parsedUploadedItem = null;
+					
 					//iterate over uploaded files
 					while (iter.hasNext()) {
 					    FileItem item = iter.next();
 					    	try {
-					    		System.out.println("Memory: " + item.isInMemory());
+					    		System.out.println("Datei befindet sich im RAM: " + item.isInMemory());
 					    		//get input stream of the current item
 					    		InputStream uploadedItemIS = item.getInputStream();
 					    		
 					    		//parse the input stream and output a w3c document
-								Document parsedUploadedItem = xmlBuilder.parse(uploadedItemIS);
+								parsedUploadedItem = xmlBuilder.parse(uploadedItemIS);
 								
 								//validate parsed file, will throw exception if not valid
 								bmeCatSchema.newValidator().validate(new DOMSource(parsedUploadedItem));
@@ -158,6 +169,35 @@ public class ImportProductCatalogAction implements IAction {
 								//item.delete();
 							}
 					}
+					
+					//parsedUploadedItem koennte null sein!!
+					try {
+						
+						//return type is nodeSet with all Articles. Cool right? XPath value could be everything
+						NodeList values = (NodeList) xpFactory.newXPath().evaluate("/BMECAT/T_NEW_CATALOG/ARTICLE", parsedUploadedItem, XPathConstants.NODESET);
+						//iterate over the nodeset and get _all_ the contens!
+						for (int i = 0; i < values.getLength(); i++) {	
+							Element el = (Element) values.item(i);
+							
+							//get the supplier id for the article
+							System.out.println("Artikel: " + el.getFirstChild().getTextContent());
+							//get the Article_Details of the current article. m'kay?
+							NodeList values2 = (NodeList) xpFactory.newXPath().evaluate("ARTICLE_DETAILS/*", el, XPathConstants.NODESET);
+							for(int j = 0; j < values2.getLength(); j++){
+								
+								//get the node name and it's value
+								System.out.println(values2.item(j).getNodeName() + ": "+ values2.item(j).getTextContent());
+					        }
+							System.out.println("----------------------------------------------");
+							System.out.println("");
+
+					      }
+						
+					} catch (XPathExpressionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
 //            // parameter not set or product not found
 //            errorList.add("Die angegebene Materialnummer ist fehlerhaft!");
 //            errorList.add(PARAM_NAME_MATERIAL_NUMBER + ": " + request.getParameter(PARAM_NAME_MATERIAL_NUMBER));
