@@ -63,100 +63,99 @@ public class ImportProductCatalogAction implements IAction {
 				
 				//get FileCleaningTracker, tracking files saved to a temp dir
 				FileCleaningTracker fileCleaningTracker = FileCleanerCleanup.getFileCleaningTracker(context);
-					//beyond this value (in bytes) all files will be written to a temp dir
-					int yourMaxMemorySize = 1000;
-					// Create a factory for disk-based file items
-					DiskFileItemFactory factory = new DiskFileItemFactory();
-					
-					// Set factory constraints
-					factory.setSizeThreshold(yourMaxMemorySize);
-					
-					//set FileCleaningtracker
-					factory.setFileCleaningTracker(fileCleaningTracker);
-					// Configure a repository (to ensure a secure temp location is used)
-					ServletContext servletContext = request.getSession().getServletContext();
-					File repository = (File) servletContext.getAttribute("javax.servlet.context.tempdir");
-					System.out.println(repository.getAbsolutePath());
-					factory.setRepository(repository);
+				//beyond this value (in bytes) all files will be written to a temp dir
+				int yourMaxMemorySize = 1000;
+				// Create a factory for disk-based file items
+				DiskFileItemFactory factory = new DiskFileItemFactory();
+				
+				// Set factory constraints
+				factory.setSizeThreshold(yourMaxMemorySize);
+				
+				//set FileCleaningtracker
+				factory.setFileCleaningTracker(fileCleaningTracker);
+				// Configure a repository (to ensure a secure temp location is used)
+				File repository = (File) context.getAttribute("javax.servlet.context.tempdir");
+				System.out.println(repository.getAbsolutePath());
+				factory.setRepository(repository);
 
-					// Create a new file upload handler
-					ServletFileUpload upload = new ServletFileUpload(factory);
+				// Create a new file upload handler
+				ServletFileUpload upload = new ServletFileUpload(factory);
 
-					// Parse the request
-					List<FileItem> items = null;
-					try {
-						 items = upload.parseRequest(request);
-					} catch (FileUploadException e) {
-						System.out.println("Could not parse upload request.");
-						e.printStackTrace();
-					}
-					
-					Iterator<FileItem> iter = items.iterator();
-					
-					//get and set schema
-					SchemaFactory sFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-					Schema bmeCatSchema = null;
-					try {
-						bmeCatSchema = sFactory.newSchema(new File("C:\\temp\\bmecat_new_catalog_1_2_simple_V0.96.xsd"));
-					} catch (SAXException e1) {
-						// TODO Auto-generated catch block
-						System.out.println("could not create schema.");
-						e1.printStackTrace();
-					}
-					DocumentBuilder xmlBuilder = null;
-					DocumentBuilderFactory dbfactory = DocumentBuilderFactory.newInstance();
-					
-					//set properties
-					dbfactory.setValidating(true);
-					dbfactory.setExpandEntityReferences(true);
-					dbfactory.setIgnoringElementContentWhitespace(true);
-					
-					//this will allow namespaces to be specified in the xml documents
-					dbfactory.setNamespaceAware(true);
-					
-					dbfactory.setSchema(bmeCatSchema);
-					dbfactory.setIgnoringComments(true);
-					dbfactory.setXIncludeAware(false);
-					
-					
-					try {
-						xmlBuilder = dbfactory.newDocumentBuilder();
-					} catch (ParserConfigurationException e) {
-						System.out.println("Could not get xmlBuilder.");	
-						e.printStackTrace();
-					}
-					
-					//set ErrorHandler
-					xmlBuilder.setErrorHandler(new org.xml.sax.helpers.DefaultHandler());
-					xmlBuilder.setEntityResolver(null);
-					
-					//iterate over uploaded files
-					while (iter.hasNext()) {
-					    FileItem item = iter.next();
-					    	try {
-					    		System.out.println("Memory: " + item.isInMemory());
-					    		//get input stream of the current item
-					    		InputStream uploadedItemIS = item.getInputStream();
-					    		
-					    		//parse the input stream and output a w3c document
-								Document parsedUploadedItem = xmlBuilder.parse(uploadedItemIS);
-								
-								//validate parsed file, will throw exception if not valid
-								bmeCatSchema.newValidator().validate(new DOMSource(parsedUploadedItem));
-								
-								//close input stream
-								uploadedItemIS.close();
-							} catch (SAXException e) {
-								System.out.println("XML file is not valid!");			
-								e.printStackTrace();
-							} catch (IOException e) {
-								System.out.println("Could not parse to w3c document.");			
-								e.printStackTrace();
-							}finally{
-								//for deletion of create item in temp folder, otherwise gc will delete it some day
-								
-								//item.delete();
-							}
+				// Parse the request
+				List<FileItem> items = null;
+				try {
+					 items = upload.parseRequest(request);
+				} catch (FileUploadException e) {
+					System.out.println("Could not parse upload request.");
+					e.printStackTrace();
+				}
+				
+				Iterator<FileItem> iter = items.iterator();
+				
+				//get and set schema
+				SchemaFactory sFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+				Schema bmeCatSchema = null;
+				try {
+					bmeCatSchema = sFactory.newSchema(new File("C:\\temp\\bmecat_new_catalog_1_2_simple_V0.96.xsd"));
+				} catch (SAXException e1) {
+					// TODO Auto-generated catch block
+					System.out.println("could not create schema.");
+					e1.printStackTrace();
+				}
+				DocumentBuilder xmlBuilder = null;
+				DocumentBuilderFactory dbfactory = DocumentBuilderFactory.newInstance();
+				
+				//set properties
+				dbfactory.setValidating(true);
+				dbfactory.setExpandEntityReferences(true);
+				dbfactory.setIgnoringElementContentWhitespace(true);
+				
+				//this will allow namespaces to be specified in the xml documents
+				dbfactory.setNamespaceAware(true);
+				
+				dbfactory.setSchema(bmeCatSchema);
+				dbfactory.setIgnoringComments(true);
+				dbfactory.setXIncludeAware(false);
+				
+				
+				try {
+					xmlBuilder = dbfactory.newDocumentBuilder();
+				} catch (ParserConfigurationException e) {
+					System.out.println("Could not get xmlBuilder.");	
+					e.printStackTrace();
+				}
+				
+				//set ErrorHandler
+				xmlBuilder.setErrorHandler(new org.xml.sax.helpers.DefaultHandler());
+				xmlBuilder.setEntityResolver(null);
+				
+				//iterate over uploaded files
+				while (iter.hasNext()) {
+				    FileItem item = iter.next();
+				    	try {
+				    		System.out.println("Memory: " + item.isInMemory());
+				    		//get input stream of the current item
+				    		InputStream uploadedItemIS = item.getInputStream();
+				    		
+				    		//parse the input stream and output a w3c document
+							Document parsedUploadedItem = xmlBuilder.parse(uploadedItemIS);
+							
+							//validate parsed file, will throw exception if not valid
+							bmeCatSchema.newValidator().validate(new DOMSource(parsedUploadedItem));
+							
+							//close input stream
+							uploadedItemIS.close();
+						} catch (SAXException e) {
+							System.out.println("XML file is not valid!");			
+							e.printStackTrace();
+						} catch (IOException e) {
+							System.out.println("Could not parse to w3c document.");			
+							e.printStackTrace();
+						}finally{
+							//for deletion of create item in temp folder, otherwise gc will delete it some day
+							
+							//item.delete();
+						}
 					}
 //            // parameter not set or product not found
 //            errorList.add("Die angegebene Materialnummer ist fehlerhaft!");
