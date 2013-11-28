@@ -1,10 +1,12 @@
 package de.htwg_konstanz.ebus.wholesaler.action;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.ProductBOA;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.security.Security;
 import de.htwg_konstanz.ebus.wholesaler.demo.IAction;
 import de.htwg_konstanz.ebus.wholesaler.demo.LoginBean;
@@ -13,6 +15,8 @@ import de.htwg_konstanz.ebus.wholesaler.demo.util.Constants;
 public class ImportProductCatalogActionHandler implements IAction {
 
 	public static final String PARAM_LOGIN_BEAN = "loginBean";
+	private static final String PARAM_PRODUCT_LIST = "productList";
+
 
 	@Override
 	public String execute(HttpServletRequest request,
@@ -29,6 +33,9 @@ public class ImportProductCatalogActionHandler implements IAction {
 			if (Security.getInstance().isUserAllowed(loginBean.getUser(), Security.RESOURCE_ALL, Security.ACTION_READ))
 			{
 				// redirect to the product page
+				//TODO: FOR CURRENT SUPPLIER
+				List<?> productList = ProductBOA.getInstance().findAll();
+				request.getSession(true).setAttribute(PARAM_PRODUCT_LIST, productList);		
 				return "import.jsp";
 			}
 			else

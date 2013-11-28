@@ -24,5 +24,23 @@ File to upload: <input type="file" name="upfile"><br/>
   <input type="submit" value="Press"> to upload the file!
 </form>
 
+<table class="dataTable">
+<thead>
+<tr>
+<th><b>Title</b></th>
+<th><b>Description</b></th>
+</tr>
+</thead>
+<tbody>
+<c:forEach var="product" items="${sessionScope.productList}">
+<jsp:useBean id="product" type="de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOProduct" />
+<tr valign="top">
+<td><%= product.getShortDescription() %></td> 
+<td width="400px"><%= product.getLongDescription() %></td> 
+</tr>
+</c:forEach>
+</tbody>
+</table>
+
 </body>
 </html>

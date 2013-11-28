@@ -3,12 +3,10 @@ package de.htwg_konstanz.ebus.wholesaler.action;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.naming.Context;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,16 +27,16 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.FileCleanerCleanup;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileCleaningTracker;
-import org.dom4j.XPath;
-import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 
-import com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl;
-
+import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOProduct;
+import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOSupplier;
+import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.ProductBOA;
+import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.SupplierBOA;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.security.Security;
 import de.htwg_konstanz.ebus.wholesaler.demo.IAction;
 import de.htwg_konstanz.ebus.wholesaler.demo.LoginBean;
@@ -47,7 +45,7 @@ import de.htwg_konstanz.ebus.wholesaler.demo.util.Constants;
 public class ImportProductCatalogAction implements IAction {
 
 	public static final String PARAM_LOGIN_BEAN = "loginBean";
-
+	private static final String PARAM_PRODUCT_LIST = "productList";
 	
 	@Override
 	public String execute(HttpServletRequest request,
@@ -63,7 +61,13 @@ public class ImportProductCatalogAction implements IAction {
 			// -> use the "Security.RESOURCE_ALL" constant which includes all resources.
 			if (Security.getInstance().isUserAllowed(loginBean.getUser(), Security.RESOURCE_ALL, Security.ACTION_READ))
 			{
-				
+				// find all available products for current Suppllier and put it to the session
+				//TODO: FOR CURRENT SUPPLIER
+				List<?> productList = ProductBOA.getInstance().findAll();
+				request.getSession(true).setAttribute(PARAM_PRODUCT_LIST, productList);					
+			
+				// redirect to the product page
+
 				//get context from session, need to think about that
 				ServletContext context = request.getSession().getServletContext();
 				
@@ -87,108 +91,120 @@ public class ImportProductCatalogAction implements IAction {
 				// Create a new file upload handler
 				ServletFileUpload upload = new ServletFileUpload(factory);
 
-				// Parse the request
-				List<FileItem> items = null;
-				try {
-					 items = upload.parseRequest(request);
-				} catch (FileUploadException e) {
-					System.out.println("Could not parse upload request.");
-					e.printStackTrace();
-				}
-				
-				Iterator<FileItem> iter = items.iterator();
-				
-				//get and set schema
-				SchemaFactory sFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-				Schema bmeCatSchema = null;
-				try {
-					bmeCatSchema = sFactory.newSchema(new File("C:\\Users\\Simon\\eclipse_workspaces\\workspace_WS13\\htwg.ebut.srck\\WholesalerWebDemo\\files\\bmecat_new_catalog_1_2_simple_V0.96.xsd"));
-				} catch (SAXException e1) {
-					// TODO Auto-generated catch block
-					System.out.println("could not create schema.");
-					e1.printStackTrace();
-				}
-				DocumentBuilder xmlBuilder = null;
-				DocumentBuilderFactory dbfactory = DocumentBuilderFactory.newInstance();
-				
-				//set properties
-				dbfactory.setValidating(true);
-				dbfactory.setExpandEntityReferences(true);
-				dbfactory.setIgnoringElementContentWhitespace(true);
-				
-				//this will allow namespaces to be specified in the xml documents
-				dbfactory.setNamespaceAware(true);
-				
-				dbfactory.setSchema(bmeCatSchema);
-				dbfactory.setIgnoringComments(true);
-				dbfactory.setXIncludeAware(false);
-				
-				//get XPath factory
-				XPathFactory xpFactory = XPathFactory.newInstance();		
-				
-				try {
-					xmlBuilder = dbfactory.newDocumentBuilder();
-				} catch (ParserConfigurationException e) {
-					System.out.println("Could not get xmlBuilder.");	
-					e.printStackTrace();
-				}
-				
-				//set ErrorHandler
-				xmlBuilder.setErrorHandler(new org.xml.sax.helpers.DefaultHandler());
-				xmlBuilder.setEntityResolver(null);
-				
-				//koennte null sein
-				Document parsedUploadedItem = null;
-				
-				//iterate over uploaded files
-				while (iter.hasNext()) {
-				    FileItem item = iter.next();
-				    	try {
-				    		System.out.println("Datei befindet sich im RAM: " + item.isInMemory());
-				    		//get input stream of the current item
-				    		InputStream uploadedItemIS = item.getInputStream();
-				    		
-				    		//parse the input stream and output a w3c document
-							parsedUploadedItem = xmlBuilder.parse(uploadedItemIS);
-							
-							//validate parsed file, will throw exception if not valid
-							bmeCatSchema.newValidator().validate(new DOMSource(parsedUploadedItem));
-							
-							//close input stream
-							uploadedItemIS.close();
-						} catch (SAXException e) {
-							System.out.println("XML file is not valid!");			
-							e.printStackTrace();
-						} catch (IOException e) {
-							System.out.println("Could not parse to w3c document.");			
-							e.printStackTrace();
-						}finally{
-							//for deletion of create item in temp folder, otherwise gc will delete it some day
-							
-							//item.delete();
-						}
+					// Parse the request
+					List<FileItem> items = null;
+					try {
+						 items = upload.parseRequest(request);
+					} catch (FileUploadException e) {
+						System.out.println("Could not parse upload request.");
+						e.printStackTrace();
+					}
+					
+					Iterator<FileItem> iter = items.iterator();
+					
+					//get and set schema
+					SchemaFactory sFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+					Schema bmeCatSchema = null;
+					try {
+						bmeCatSchema = sFactory.newSchema(new File("C:\\Users\\Simon\\eclipse_workspaces\\workspace_WS13\\htwg.ebut.srck\\WholesalerWebDemo\\files\\bmecat_new_catalog_1_2_simple_V0.96.xsd"));
+					} catch (SAXException e1) {
+						// TODO Auto-generated catch block
+						System.out.println("could not create schema.");
+						e1.printStackTrace();
+					}
+					DocumentBuilder xmlBuilder = null;
+					DocumentBuilderFactory dbfactory = DocumentBuilderFactory.newInstance();
+					
+					//set properties
+					dbfactory.setValidating(true);
+					dbfactory.setExpandEntityReferences(true);
+					dbfactory.setIgnoringElementContentWhitespace(true);
+					
+					//this will allow namespaces to be specified in the xml documents
+					dbfactory.setNamespaceAware(true);
+					
+					dbfactory.setSchema(bmeCatSchema);
+					dbfactory.setIgnoringComments(true);
+					dbfactory.setXIncludeAware(false);
+					
+					//get XPath factory
+					XPathFactory xpFactory = XPathFactory.newInstance();		
+					
+					try {
+						xmlBuilder = dbfactory.newDocumentBuilder();
+					} catch (ParserConfigurationException e) {
+						System.out.println("Could not get xmlBuilder.");	
+						e.printStackTrace();
+					}
+					
+					//set ErrorHandler
+					xmlBuilder.setErrorHandler(new org.xml.sax.helpers.DefaultHandler());
+					xmlBuilder.setEntityResolver(null);
+					
+					//koennte null sein
+					Document parsedUploadedItem = null;
+					
+					//iterate over uploaded files
+					while (iter.hasNext()) {
+					    FileItem item = iter.next();
+					    	try {
+					    		System.out.println("Datei befindet sich im RAM: " + item.isInMemory());
+					    		//get input stream of the current item
+					    		InputStream uploadedItemIS = item.getInputStream();
+					    		
+					    		//parse the input stream and output a w3c document
+								parsedUploadedItem = xmlBuilder.parse(uploadedItemIS);
+								
+								//validate parsed file, will throw exception if not valid
+								bmeCatSchema.newValidator().validate(new DOMSource(parsedUploadedItem));
+								
+								//close input stream
+								uploadedItemIS.close();
+							} catch (SAXException e) {
+								System.out.println("XML file is not valid!");			
+								e.printStackTrace();
+							} catch (IOException e) {
+								System.out.println("Could not parse to w3c document.");			
+								e.printStackTrace();
+							}finally{
+								//for deletion of create item in temp folder, otherwise gc will delete it some day
+								
+								//item.delete();
+							}
 					}
 					
 					//parsedUploadedItem koennte null sein!!
 					try {
 						
 						//return type is nodeSet with all Articles. Cool right? XPath value could be everything
-						NodeList values = (NodeList) xpFactory.newXPath().evaluate("/BMECAT/T_NEW_CATALOG/ARTICLE", parsedUploadedItem, XPathConstants.NODESET);
+						NodeList articles = (NodeList) xpFactory.newXPath().evaluate("/BMECAT/T_NEW_CATALOG/ARTICLE", parsedUploadedItem, XPathConstants.NODESET);
 						//iterate over the nodeset and get _all_ the contens!
-						for (int i = 0; i < values.getLength(); i++) {	
-							Element el = (Element) values.item(i);
+						for (int i = 0; i < articles.getLength(); i++) {
 							
-							//get the supplier id for the article
-							System.out.println("Artikel: " + el.getFirstChild().getTextContent());
-							//get the Article_Details of the current article. m'kay?
-							NodeList values2 = (NodeList) xpFactory.newXPath().evaluate("ARTICLE_DETAILS/*", el, XPathConstants.NODESET);
-							for(int j = 0; j < values2.getLength(); j++){
+							Element currentArticle = (Element) articles.item(i);
+							NodeList currentArticleChilds = currentArticle.getChildNodes();
+							
+						    BOProduct product = new BOProduct();
+							for(int j = 0; j < currentArticleChilds.getLength(); j++){
 								
-								//get the node name and it's value
-								System.out.println(values2.item(j).getNodeName() + ": "+ values2.item(j).getTextContent());
-					        }
-							System.out.println("----------------------------------------------");
-							System.out.println("");
+								String currentNodeName = currentArticleChilds.item(j).getNodeName();
+								Node currentNode = currentArticleChilds.item(j);
+								if(Constants.ARTICLE_CHILD_SUPPLIER_AID.equals(currentNodeName)){
+									getSupplierAID(currentNode);
+								}else if (Constants.ARTICLE_CHILD_ARTICLE_ORDER_DETAILS.equals(currentNodeName)){
+									
+								}else if (Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS.equals(currentNodeName)){
+									
+								}else if (Constants.ARTICLE_CHILD_ARTICLE_REFERENCE.equals(currentNodeName)){
+									
+								}else if (Constants.ARTICLE_CHILD_ARTICLE_DETAILS.equals(currentNodeName)){
+									product = getArticleDetails(currentNode, product);
+								}
+							}
+							System.out.println(product.getLongDescription());
+							product.setOrderNumberSupplier("aasd");
+							product.setOrderNumberCustomer("asds");
+						  //  ProductBOA.getInstance().saveOrUpdate(product);
 
 					      }
 						
@@ -218,6 +234,36 @@ public class ImportProductCatalogAction implements IAction {
 		else
 			// redirect to the login page
 			return "login.jsp";				
+	}
+
+	private BOProduct getArticleDetails(Node node, BOProduct product) {
+		NodeList childNodes = node.getChildNodes();
+		for(int i = 0; i < childNodes.getLength(); i++){
+			Node childNode = childNodes.item(i);
+			if(Constants.ARTICLE_CHILD_ARTICLE_DETAILS_DESCRIPTION_LONG.equals(childNode.getNodeName())){
+				if(childNode.getTextContent() != null){
+					product.setLongDescription(childNode.getTextContent());
+				}
+			}else if(Constants.ARTICLE_CHILD_ARTICLE_DETAILS_DESCRIPTION_SHORT.equals(childNode.getNodeName())){
+				if(childNode.getTextContent() != null){
+					product.setShortDescription(childNode.getTextContent());
+				}
+			}
+		}
+		return product;
+		
+	}
+
+	private void getArticleOrderDetails(Node node) {
+
+	}
+
+	/*
+	 * @param currentArticleChilds 
+	 * Returns the Supplier-Article-Number 
+	 */
+	private String getSupplierAID(Node currentArticleChilds) {
+		return currentArticleChilds.getTextContent();
 	}
 
 	@Override

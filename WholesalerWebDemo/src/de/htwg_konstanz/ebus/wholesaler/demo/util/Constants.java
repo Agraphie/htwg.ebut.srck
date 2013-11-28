@@ -66,4 +66,17 @@ public class Constants {
 	// new constants
 	public static final String ACTION_HANDLER_IMPORT_SUPPLIER_PRODUCTS = "importSupplierProductsHandler";
 	public static final String ACTION_IMPORT_SUPPLIER_PRODUCTS = "importSupplierProducts";
+	
+	public static final String ARTICLE_CHILD_SUPPLIER_AID = "SUPPLIER_AID";
+	public static final String ARTICLE_CHILD_ARTICLE_DETAILS = "ARTICLE_DETAILS";
+	public static final String ARTICLE_CHILD_ARTICLE_ORDER_DETAILS = "ARTICLE_ORDER_DETAILS";
+	public static final String ARTICLE_CHILD_ARTICLE_PRICE_DETAILS = "ARTICLE_PRICE_DETAILS";
+	public static final String ARTICLE_CHILD_ARTICLE_REFERENCE = "ARTICLE_REFERENCE";
+	
+	public static final String ARTICLE_CHILD_ARTICLE_DETAILS_DESCRIPTION_SHORT = "DESCRIPTION_SHORT";
+	public static final String ARTICLE_CHILD_ARTICLE_DETAILS_DESCRIPTION_LONG = "DESCRIPTION_LONG";
+
+
+
+			
 }
