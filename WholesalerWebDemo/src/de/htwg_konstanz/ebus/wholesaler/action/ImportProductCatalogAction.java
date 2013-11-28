@@ -36,8 +36,10 @@ import org.xml.sax.SAXParseException;
 
 import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOProduct;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOSupplier;
+import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOUserSupplier;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.ProductBOA;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.SupplierBOA;
+import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.UserBOA;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.security.Security;
 import de.htwg_konstanz.ebus.wholesaler.demo.IAction;
 import de.htwg_konstanz.ebus.wholesaler.demo.LoginBean;
@@ -118,7 +120,7 @@ public class ImportProductCatalogAction implements IAction {
 					try {
 						bmeCatSchema = sFactory
 								.newSchema(new File(
-										"C:\\Users\\Simon\\eclipse_workspaces\\workspace_WS13\\htwg.ebut.srck\\WholesalerWebDemo\\files\\bmecat_new_catalog_1_2_simple_V0.96.xsd"));
+										"C:\\temp\\bmecat_new_catalog_1_2_simple_V0.96.xsd"));
 					} catch (SAXException e1) {
 						// TODO Auto-generated catch block
 						System.out.println("could not create schema.");
@@ -220,6 +222,7 @@ public class ImportProductCatalogAction implements IAction {
 							NodeList currentArticleChilds = currentArticle.getChildNodes();
 							
 						    BOProduct product = new BOProduct();
+							
 							for(int j = 0; j < currentArticleChilds.getLength(); j++){
 								
 								String currentNodeName = currentArticleChilds.item(j).getNodeName();
@@ -237,9 +240,18 @@ public class ImportProductCatalogAction implements IAction {
 								}
 							}
 							System.out.println(product.getLongDescription());
-							product.setOrderNumberSupplier("aasd");
-							product.setOrderNumberCustomer("asds");
-						  //  ProductBOA.getInstance().saveOrUpdate(product);
+							product.setOrderNumberSupplier("aasd"+i);
+							product.setOrderNumberCustomer("asds"+i);
+							
+							//get the supplier id
+							int supplierID = loginBean.getUser().getId();	
+							System.out.println(supplierID);
+							BOUserSupplier sup = UserBOA.getInstance().findUserSupplierById(supplierID);
+							System.out.println(sup.getOrganization().getSupplierNumber());
+							//BO supplier, cause foreign key. Get supplier with supplierID (maybe from session?)
+							product.setSupplier(SupplierBOA.getInstance().findSupplierById(sup.getId().toString()));
+							
+						   ProductBOA.getInstance().saveOrUpdate(product);
 
 
 						}
