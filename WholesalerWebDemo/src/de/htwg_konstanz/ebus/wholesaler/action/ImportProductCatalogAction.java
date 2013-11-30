@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -41,8 +42,10 @@ import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOSalesPrice;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOSupplier;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.CountryBOA;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.PriceBOA;
+import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOUserSupplier;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.ProductBOA;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.SupplierBOA;
+import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.UserBOA;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.security.Security;
 import de.htwg_konstanz.ebus.wholesaler.demo.IAction;
 import de.htwg_konstanz.ebus.wholesaler.demo.LoginBean;
@@ -68,27 +71,22 @@ public class ImportProductCatalogAction implements IAction {
 			// at this time the authorization is not fully implemented.
 
 			// -> use the "Security.RESOURCE_ALL" constant which includes all resources.
-			if (Security.getInstance().isUserAllowed(loginBean.getUser(), Security.RESOURCE_ALL, Security.ACTION_READ)){
-				// find all available products for current Supplier and put it to the session
-				//TODO: FOR CURRENT SUPPLIER
-				
-//				IBOUser currentUser = loginBean.getUser();
-//				List <BOSupplier> suppliers = SupplierBOA.getInstance().findAll();
-//
-//				BOSupplier currentSupplier;
-//				for(BOSupplier supplierTemp : suppliers){
-//					if(supplierTemp.getAddress().equals(currentUser.getAddress())){
-//						currentSupplier = supplierTemp;
-//					}else{
-//						System.out.println("no supplier");
-//					}
-//				}
-						
-				List<?> productList = ProductBOA.getInstance().findAll();
-				request.getSession(true).setAttribute(PARAM_PRODUCT_LIST, productList);					
-			
-				// redirect to the product page
 
+			if (Security.getInstance().isUserAllowed(loginBean.getUser(), Security.RESOURCE_ALL, Security.ACTION_READ))
+			{
+				//get the supplier id and supplier
+				int supplierID = loginBean.getUser().getId();	
+				BOUserSupplier sup = UserBOA.getInstance().findUserSupplierById(supplierID);
+				BOSupplier endSupplier = null;
+				List<BOSupplier> sersup = SupplierBOA.getInstance().findAll();
+				Iterator<BOSupplier> it = sersup.listIterator();
+				while(it.hasNext()){
+					endSupplier = it.next();
+					if(endSupplier.getAddress().getId() == sup.getOrganization().getAddress().getId()){
+						break;
+					}
+				}
+				
 				//get context from session, need to think about that
 				ServletContext context = request.getSession().getServletContext();
 				
@@ -132,6 +130,7 @@ public class ImportProductCatalogAction implements IAction {
 					Schema bmeCatSchema = null;
 					try {
 						bmeCatSchema = sFactory.newSchema(new File("C:\\Users\\Simon\\eclipse_workspaces\\workspace_WS13\\htwg.ebut.srck\\WholesalerWebDemo\\files\\bmecat_new_catalog_1_2_simple_V0.96.xsd"));
+
 					} catch (SAXException e1) {
 						// TODO Auto-generated catch block
 						System.out.println("could not create schema.");
@@ -171,8 +170,7 @@ public class ImportProductCatalogAction implements IAction {
 					while (iter.hasNext()) {
 						FileItem item = iter.next();
 						try {
-							System.out.println("Datei befindet sich im RAM: "
-									+ item.isInMemory());
+							System.out.println("Datei befindet sich im RAM: " + item.isInMemory());
 							// get input stream of the current item
 							InputStream uploadedItemIS = item.getInputStream();
 
@@ -212,14 +210,32 @@ public class ImportProductCatalogAction implements IAction {
 						}
 					}
 
-					// parsedUploadedItem koennte null sein!!
 					try {
 						
 						//return type is nodeSet with all Articles. Cool right? XPath value could be everything
 						// get XPath factory
 						XPathFactory xpFactory = XPathFactory.newInstance();
 						NodeList articles = (NodeList) xpFactory.newXPath().evaluate("/BMECAT/T_NEW_CATALOG/ARTICLE", parsedUploadedItem, XPathConstants.NODESET);
-						createAndPersistArticles(articles);
+						createAndPersistArticles(articles, endSupplier);
+
+						// find all available products for current Supplier and put it to the session 
+						//now with our new products so a realoading of the site won't be necessary!
+						//Use temp list to save all the products which belong to the logged in supplier
+						List<BOProduct> productList = ProductBOA.getInstance().findAll();
+
+						List<BOProduct> productListTemp = new LinkedList<BOProduct>();
+						Iterator<BOProduct> iterator = productList.iterator();
+						BOProduct productTemp;
+						while(iterator.hasNext()){
+							productTemp = iterator.next();
+							if(productTemp.getSupplier().getSupplierNumber() == endSupplier.getSupplierNumber()){
+								productListTemp.add(productTemp);
+							}
+						}
+						//now set the right list to the temp list
+						productList = productListTemp;
+						request.getSession(true).setAttribute(PARAM_PRODUCT_LIST, productList);	
+						
 					} catch (XPathExpressionException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -250,14 +266,13 @@ public class ImportProductCatalogAction implements IAction {
 			return "login.jsp";
 	}
 
-	private void createAndPersistArticles(NodeList articles) {
+	private void createAndPersistArticles(NodeList articles, BOSupplier supplier) {
 		//iterate over the nodeset and get _all_ the contens!
 		for (int i = 0; i < articles.getLength(); i++) {
 			Element currentArticle = (Element) articles.item(i);
 			NodeList currentArticleChilds = currentArticle.getChildNodes();
 			
 		    BOProduct product = new BOProduct();
-			BOSupplier supplier = SupplierBOA.getInstance().findSupplierById("10");
 
 			for(int j = 0; j < currentArticleChilds.getLength(); j++){
 				
@@ -318,7 +333,7 @@ public class ImportProductCatalogAction implements IAction {
 	}
 	
 	/*
-	 * Das Element <ARTICLE_PRICE_DETAILS> hat kinder und kindeskinder. um doppelte for-schleife zu vermeiden mittels xpFactory geholt! y0?
+	 * Das Element <ARTICLE_PRICE_DETAILS> hat kinder und kindeskinder. um noch eine doppelte for-schleife zu vermeiden mittels xpFactory geholt! y0?
 	 */
 	private NodeList fetchArticlePrices(Element currentNode) {
 		try {
@@ -377,7 +392,7 @@ public class ImportProductCatalogAction implements IAction {
 						product.setOrderNumberCustomer(textContent);
 						product.setOrderNumberSupplier(textContent);
 				}
-				//TODO: was mit zusätzlichen Artikelnummern?
+				//TODO: wohin mit zusätzlichen Artikelnummern?
 			}
 		}
 		return product;
