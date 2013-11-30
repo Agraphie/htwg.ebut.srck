@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -67,11 +68,20 @@ public class ImportProductCatalogAction implements IAction {
 			// -> use the "Security.RESOURCE_ALL" constant which includes all resources.
 			if (Security.getInstance().isUserAllowed(loginBean.getUser(), Security.RESOURCE_ALL, Security.ACTION_READ))
 			{
-				// find all available products for current Suppllier and put it to the session
-				//TODO: FOR CURRENT SUPPLIER
-				List<?> productList = ProductBOA.getInstance().findAll();
-				request.getSession(true).setAttribute(PARAM_PRODUCT_LIST, productList);					
-			
+				//get the supplier id and supplier
+				int supplierID = loginBean.getUser().getId();	
+				BOUserSupplier sup = UserBOA.getInstance().findUserSupplierById(supplierID);
+				BOSupplier endSupplier = null;
+				List<BOSupplier> sersup = SupplierBOA.getInstance().findAll();
+				Iterator<BOSupplier> it = sersup.listIterator();
+				while(it.hasNext()){
+					endSupplier = it.next();
+					if(endSupplier.getAddress().getId() == sup.getOrganization().getAddress().getId())
+					{
+						break;
+					}
+				}
+				
 				// redirect to the product page
 
 				//get context from session, need to think about that
@@ -210,7 +220,6 @@ public class ImportProductCatalogAction implements IAction {
 						}
 					}
 
-					// parsedUploadedItem koennte null sein!!
 					try {
 						
 						//return type is nodeSet with all Articles. Cool right? XPath value could be everything
@@ -243,16 +252,32 @@ public class ImportProductCatalogAction implements IAction {
 							product.setOrderNumberSupplier("aasd"+i);
 							product.setOrderNumberCustomer("asds"+i);
 							
-							//get the supplier id
-							int supplierID = loginBean.getUser().getId();	
-							System.out.println(supplierID);
-							BOUserSupplier sup = UserBOA.getInstance().findUserSupplierById(supplierID);
+						
+							
+						
 							System.out.println(sup.getOrganization().getSupplierNumber());
 							//BO supplier, cause foreign key. Get supplier with supplierID (maybe from session?)
-							product.setSupplier(SupplierBOA.getInstance().findSupplierById(sup.getId().toString()));
+							product.setSupplier(endSupplier);
 							
 						   ProductBOA.getInstance().saveOrUpdate(product);
+						   
+						// find all available products for current Supplier and put it to the session 
+						   //now with our new products so a realoading of the site won't be necessary!
+							//Use temp list to save all the products which belong to the logged in supplier
+							List<BOProduct> productList = ProductBOA.getInstance().findAll();
 
+							List<BOProduct> productListTemp = new LinkedList<BOProduct>();
+							Iterator<BOProduct> iterator = productList.iterator();
+							BOProduct productTemp;
+							while(iterator.hasNext()){
+								productTemp = iterator.next();
+								if(productTemp.getSupplier().getSupplierNumber() == endSupplier.getSupplierNumber()){
+									productListTemp.add(productTemp);
+								}
+							}
+							//now set the right list to the temp list
+							productList = productListTemp;
+							request.getSession(true).setAttribute(PARAM_PRODUCT_LIST, productList);	
 
 						}
 

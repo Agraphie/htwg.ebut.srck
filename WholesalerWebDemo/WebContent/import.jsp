@@ -58,8 +58,8 @@
 <c:forEach var="product" items="${sessionScope.productList}">
 <jsp:useBean id="product" type="de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOProduct" />
 <tr valign="top">
-<td><%= product.getShortDescription() %></td> 
-<td width="400px"><%= product.getLongDescription() %></td> 
+<td><%= product.getShortDescriptionCustomer() %></td> 
+<td width="400px"><%= product.getLongDescriptionCustomer()%></td> 
 </tr>
 </c:forEach>
 </tbody>

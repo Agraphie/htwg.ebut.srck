@@ -1,12 +1,19 @@
 package de.htwg_konstanz.ebus.wholesaler.action;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOProduct;
+import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOSupplier;
+import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOUserSupplier;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.ProductBOA;
+import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.SupplierBOA;
+import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.UserBOA;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.security.Security;
 import de.htwg_konstanz.ebus.wholesaler.demo.IAction;
 import de.htwg_konstanz.ebus.wholesaler.demo.LoginBean;
@@ -34,8 +41,37 @@ public class ImportProductCatalogActionHandler implements IAction {
 			{
 				// redirect to the product page
 				//TODO: FOR CURRENT SUPPLIER
-				List<?> productList = ProductBOA.getInstance().findAll();
-				request.getSession(true).setAttribute(PARAM_PRODUCT_LIST, productList);		
+				List<BOProduct> productList = ProductBOA.getInstance().findAll();
+				//get the supplier id and supplier
+				int supplierID = loginBean.getUser().getId();	
+				BOUserSupplier sup = UserBOA.getInstance().findUserSupplierById(supplierID);
+				BOSupplier endSupplier = null;
+				List<BOSupplier> sersup = SupplierBOA.getInstance().findAll();
+				Iterator<BOSupplier> it = sersup.listIterator();
+				while(it.hasNext()){
+
+					endSupplier = it.next();
+					if(endSupplier.getAddress().getId() == sup.getOrganization().getAddress().getId())
+					{
+						break;
+					}
+				}
+				// find all available products for current Suppllier and put it to the session
+				//TODO: FOR CURRENT SUPPLIER
+				//Use temp list to save all the products which belong to the logged in supplier
+				List<BOProduct> productListTemp = new LinkedList<BOProduct>();
+				Iterator<BOProduct> iterator = productList.iterator();
+				BOProduct productTemp;
+				while(iterator.hasNext()){
+					productTemp = iterator.next();
+					if(productTemp.getSupplier().getSupplierNumber() == endSupplier.getSupplierNumber()){
+						productListTemp.add(productTemp);
+					}
+				}
+				//now set the right list to the temp list
+				productList = productListTemp;
+				request.getSession(true).setAttribute(PARAM_PRODUCT_LIST, productList);	
+				
 				return "import.jsp";
 			}
 			else
