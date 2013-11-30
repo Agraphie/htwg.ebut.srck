@@ -3,6 +3,7 @@ package de.htwg_konstanz.ebus.wholesaler.action;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -34,8 +35,12 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOCountry;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOProduct;
+import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOSalesPrice;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOSupplier;
+import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.CountryBOA;
+import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.PriceBOA;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.ProductBOA;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.SupplierBOA;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.security.Security;
@@ -45,13 +50,14 @@ import de.htwg_konstanz.ebus.wholesaler.demo.util.Constants;
 
 public class ImportProductCatalogAction implements IAction {
 
-	public static final String PARAM_LOGIN_BEAN = "loginBean";
+	private static final String PARAM_LOGIN_BEAN = "loginBean";
 	private static final String PARAM_PRODUCT_LIST = "productList";
+	private static final String ATTRIBUTE_PRICE_TYPE = "price_type";
+	
 	
 
 	@Override
-	public String execute(HttpServletRequest request,
-			HttpServletResponse response, ArrayList<String> errorList) {
+	public String execute(HttpServletRequest request, HttpServletResponse response, ArrayList<String> errorList) {
 		// get the login bean from the session
 		LoginBean loginBean = (LoginBean) request.getSession(true).getAttribute(PARAM_LOGIN_BEAN);
 
@@ -62,10 +68,22 @@ public class ImportProductCatalogAction implements IAction {
 			// at this time the authorization is not fully implemented.
 
 			// -> use the "Security.RESOURCE_ALL" constant which includes all resources.
-			if (Security.getInstance().isUserAllowed(loginBean.getUser(), Security.RESOURCE_ALL, Security.ACTION_READ))
-			{
+			if (Security.getInstance().isUserAllowed(loginBean.getUser(), Security.RESOURCE_ALL, Security.ACTION_READ)){
 				// find all available products for current Supplier and put it to the session
 				//TODO: FOR CURRENT SUPPLIER
+				
+//				IBOUser currentUser = loginBean.getUser();
+//				List <BOSupplier> suppliers = SupplierBOA.getInstance().findAll();
+//
+//				BOSupplier currentSupplier;
+//				for(BOSupplier supplierTemp : suppliers){
+//					if(supplierTemp.getAddress().equals(currentUser.getAddress())){
+//						currentSupplier = supplierTemp;
+//					}else{
+//						System.out.println("no supplier");
+//					}
+//				}
+						
 				List<?> productList = ProductBOA.getInstance().findAll();
 				request.getSession(true).setAttribute(PARAM_PRODUCT_LIST, productList);					
 			
@@ -135,9 +153,6 @@ public class ImportProductCatalogAction implements IAction {
 					dbfactory.setIgnoringComments(true);
 					dbfactory.setXIncludeAware(false);
 
-					// get XPath factory
-					XPathFactory xpFactory = XPathFactory.newInstance();
-
 					try {
 						xmlBuilder = dbfactory.newDocumentBuilder();
 					} catch (ParserConfigurationException e) {
@@ -201,38 +216,10 @@ public class ImportProductCatalogAction implements IAction {
 					try {
 						
 						//return type is nodeSet with all Articles. Cool right? XPath value could be everything
+						// get XPath factory
+						XPathFactory xpFactory = XPathFactory.newInstance();
 						NodeList articles = (NodeList) xpFactory.newXPath().evaluate("/BMECAT/T_NEW_CATALOG/ARTICLE", parsedUploadedItem, XPathConstants.NODESET);
-						//iterate over the nodeset and get _all_ the contens!
-						for (int i = 0; i < articles.getLength(); i++) {
-							
-							Element currentArticle = (Element) articles.item(i);
-							NodeList currentArticleChilds = currentArticle.getChildNodes();
-							
-						    BOProduct product = new BOProduct();
-							for(int j = 0; j < currentArticleChilds.getLength(); j++){
-								
-								String currentNodeName = currentArticleChilds.item(j).getNodeName();
-								Node currentNode = currentArticleChilds.item(j);
-								if(Constants.ARTICLE_CHILD_SUPPLIER_AID.equals(currentNodeName)){
-									getSupplierAID(currentNode);
-								}else if (Constants.ARTICLE_CHILD_ARTICLE_ORDER_DETAILS.equals(currentNodeName)){
-									
-								}else if (Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS.equals(currentNodeName)){
-									
-								}else if (Constants.ARTICLE_CHILD_ARTICLE_REFERENCE.equals(currentNodeName)){
-									
-								}else if (Constants.ARTICLE_CHILD_ARTICLE_DETAILS.equals(currentNodeName)){
-									product = getArticleDetails(currentNode, product);
-								}
-							}
-							System.out.println(product.getLongDescription());
-							product.setOrderNumberSupplier("aasd");
-							product.setOrderNumberCustomer("asds");
-						  //  ProductBOA.getInstance().saveOrUpdate(product);
-
-
-						}
-
+						createAndPersistArticles(articles);
 					} catch (XPathExpressionException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -263,36 +250,169 @@ public class ImportProductCatalogAction implements IAction {
 			return "login.jsp";
 	}
 
-	private BOProduct getArticleDetails(Node node, BOProduct product) {
-		NodeList childNodes = node.getChildNodes();
-		for(int i = 0; i < childNodes.getLength(); i++){
-			Node childNode = childNodes.item(i);
-			if(Constants.ARTICLE_CHILD_ARTICLE_DETAILS_DESCRIPTION_LONG.equals(childNode.getNodeName())){
-				if(childNode.getTextContent() != null){
-					product.setLongDescription(childNode.getTextContent());
+	private void createAndPersistArticles(NodeList articles) {
+		//iterate over the nodeset and get _all_ the contens!
+		for (int i = 0; i < articles.getLength(); i++) {
+			Element currentArticle = (Element) articles.item(i);
+			NodeList currentArticleChilds = currentArticle.getChildNodes();
+			
+		    BOProduct product = new BOProduct();
+			BOSupplier supplier = SupplierBOA.getInstance().findSupplierById("10");
+
+			for(int j = 0; j < currentArticleChilds.getLength(); j++){
+				
+				String currentNodeName = currentArticleChilds.item(j).getNodeName();
+				Element currentNode = (Element) currentArticleChilds.item(j);
+				if(Constants.ARTICLE_CHILD_SUPPLIER_AID.equals(currentNodeName)){
+					product = setSupplierAID(currentNode, product);
+				}else if (Constants.ARTICLE_CHILD_ARTICLE_DETAILS.equals(currentNodeName)){
+					product = setArticleDetails(currentNode, product);
+				}else if (Constants.ARTICLE_CHILD_ARTICLE_ORDER_DETAILS.equals(currentNodeName)){
+					product = setArticleOrderDetails(currentNode, product);
+				}else if (Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS.equals(currentNodeName)){
+					product.setSupplier(supplier);
+					ProductBOA.getInstance().saveOrUpdate(product);
+					setArticlePriceDetails(currentNode, product);
+				}else if (Constants.ARTICLE_CHILD_ARTICLE_REFERENCE.equals(currentNodeName)){
+					
 				}
-			}else if(Constants.ARTICLE_CHILD_ARTICLE_DETAILS_DESCRIPTION_SHORT.equals(childNode.getNodeName())){
-				if(childNode.getTextContent() != null){
-					product.setShortDescription(childNode.getTextContent());
+			}
+
+		}
+	}
+
+	private void setArticlePriceDetails(Element currentNode, BOProduct product) {
+		NodeList articlePrices = fetchArticlePrices(currentNode);
+
+		for(int i = 0 ; i < articlePrices.getLength() ; i++){
+			 //create a sales price
+		    BOSalesPrice salesPrice = new BOSalesPrice();
+		    Element priceElement = (Element) articlePrices.item(i);
+		    salesPrice.setPricetype(priceElement.getAttribute(ATTRIBUTE_PRICE_TYPE));
+			NodeList priceElementChilds = priceElement.getChildNodes();
+			for(int j = 0 ; j < priceElementChilds.getLength() ; j++){
+				Node node = priceElementChilds.item(j);
+				String nodeName = node.getNodeName();
+				if(textContentNotNull(node)){
+					String textContent = node.getTextContent();
+					if(Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_PRICE_AMOUNT.equals(nodeName)){
+						salesPrice.setAmount(new BigDecimal(textContent));
+					}else if(Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_PRICE_CURRENCY.equals(nodeName)){
+						//FIXME: Load default currency of territory?!
+					}else if(Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_TAX.equals(nodeName)){
+						salesPrice.setTaxrate(new BigDecimal(textContent));
+					}else if(Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_TERRITORY.equals(nodeName)){
+						 //load a country
+						BOCountry country = CountryBOA.getInstance().findCountry(textContent);
+						salesPrice.setCountry(country);
+					}
+				}
+			}
+			//FIXME: information fehlt uns im bmecat?
+			salesPrice.setLowerboundScaledprice(new Integer(1));
+			salesPrice.setProduct(product);
+			// save the new sales price associated to the new product
+			PriceBOA.getInstance().saveOrUpdateSalesPrice(salesPrice);
+		}
+	    
+	}
+	
+	/*
+	 * Das Element <ARTICLE_PRICE_DETAILS> hat kinder und kindeskinder. um doppelte for-schleife zu vermeiden mittels xpFactory geholt! y0?
+	 */
+	private NodeList fetchArticlePrices(Element currentNode) {
+		try {
+			XPathFactory xpFactory = XPathFactory.newInstance();
+			NodeList articlePrices = (NodeList) xpFactory.newXPath().evaluate("ARTICLE_PRICE", currentNode, XPathConstants.NODESET);
+			return articlePrices;
+		} catch (XPathExpressionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/* Set ArticleOrderDetails on product?!
+	 * @param currentNode in that case <ARTICLE_ORDER_DETAILS>
+	 * @param currentProduct instance
+	 * 
+	 */
+	private BOProduct setArticleOrderDetails(Node currentNode, BOProduct product) {
+		NodeList childNodes = getChildNodes(currentNode);
+		for(int i = 0 ; i < childNodes.getLength() ; i++){
+			Node childNode = childNodes.item(i);
+			String nodeName = childNode.getNodeName();
+			if(textContentNotNull(childNode)){
+				String textContent = childNode.getTextContent();
+				if (Constants.ARTICLE_CHILD_ARTICLE_ORDER_DETAILS_NO_CU_PER_OUT.equals(nodeName)) {
+					//TODO: WORAUF setzen?
+				} else if (Constants.ARTICLE_CHILD_ARTICLE_ORDER_DETAILS_ORDER_UNIT.equals(nodeName)) {
+					//TODO: WORAUF setzen?
 				}
 			}
 		}
 		return product;
-		
-	}
-
-	private void getArticleOrderDetails(Node node) {
-
 	}
 
 	/*
-	 * @param currentArticleChilds 
-	 * Returns the Supplier-Article-Number 
+	 *  Set ArticleDetails on product
+	 *  E.g. long and shortdescription(supplier+costumer) and additional articlenumbers ...
+	 *  @param currentNode in that case <ARTICLE_DETAILS>
+	 *  @param product currentProduct instance
 	 */
-	private String getSupplierAID(Node currentArticleChilds) {
-		return currentArticleChilds.getTextContent();
+	private BOProduct setArticleDetails(Node currentNode, BOProduct product) {
+		NodeList childNodes = getChildNodes(currentNode);
+		for(int i = 0; i < childNodes.getLength(); i++){
+			Node childNode = childNodes.item(i);
+			String nodeName = childNode.getNodeName();
+			if(textContentNotNull(childNode)){
+				String textContent = childNode.getTextContent();
+				if(Constants.ARTICLE_CHILD_ARTICLE_DETAILS_DESCRIPTION_LONG.equals(nodeName)){
+						product.setLongDescription(textContent);
+						product.setLongDescriptionCustomer(textContent);
+				}else if(Constants.ARTICLE_CHILD_ARTICLE_DETAILS_DESCRIPTION_SHORT.equals(nodeName)){
+						product.setShortDescription(textContent);
+						product.setShortDescriptionCustomer(textContent);
+				}else if(Constants.ARTICLE_CHILD_ARTICLE_DETAILS_EAN.equals(nodeName)){
+						product.setOrderNumberCustomer(textContent);
+						product.setOrderNumberSupplier(textContent);
+				}
+				//TODO: was mit zusätzlichen Artikelnummern?
+			}
+		}
+		return product;
 	}
 
+
+	/*
+	 * @param currentNode in that case <SUPPLIER_AID>
+	 * @param product currentProduct instance
+	 *  
+	 * Set SupplierArticleNumber on product
+	 */
+	private BOProduct setSupplierAID(Node currentNode, BOProduct product) {
+		if (textContentNotNull(currentNode)){
+			product.setOrderNumberSupplier(currentNode.getTextContent());
+		}
+		return product;
+	}
+	
+	
+	/*
+	 * Get childnodes ...
+	 */
+	private NodeList getChildNodes(Node currentNode) {
+		return currentNode.getChildNodes();
+	}
+	
+	/*
+	 * Check for null value
+	 */
+	private boolean textContentNotNull(Node node) {
+		return node.getTextContent() != null;
+	}
+
+	
 	@Override
 	public boolean accepts(String actionName) {
 		return actionName.equalsIgnoreCase(Constants.ACTION_IMPORT_SUPPLIER_PRODUCTS);
