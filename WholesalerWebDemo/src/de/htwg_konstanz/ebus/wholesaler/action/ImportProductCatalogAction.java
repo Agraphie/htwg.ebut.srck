@@ -53,8 +53,7 @@ public class ImportProductCatalogAction implements IAction {
 	public String execute(HttpServletRequest request,
 			HttpServletResponse response, ArrayList<String> errorList) {
 		// get the login bean from the session
-		LoginBean loginBean = (LoginBean) request.getSession(true)
-				.getAttribute(PARAM_LOGIN_BEAN);
+		LoginBean loginBean = (LoginBean) request.getSession(true).getAttribute(PARAM_LOGIN_BEAN);
 
 		// ensure that the user is logged in
 		if (loginBean != null && loginBean.isLoggedIn()) {
@@ -65,7 +64,7 @@ public class ImportProductCatalogAction implements IAction {
 			// -> use the "Security.RESOURCE_ALL" constant which includes all resources.
 			if (Security.getInstance().isUserAllowed(loginBean.getUser(), Security.RESOURCE_ALL, Security.ACTION_READ))
 			{
-				// find all available products for current Suppllier and put it to the session
+				// find all available products for current Supplier and put it to the session
 				//TODO: FOR CURRENT SUPPLIER
 				List<?> productList = ProductBOA.getInstance().findAll();
 				request.getSession(true).setAttribute(PARAM_PRODUCT_LIST, productList);					
@@ -90,8 +89,7 @@ public class ImportProductCatalogAction implements IAction {
 				factory.setFileCleaningTracker(fileCleaningTracker);
 				// Configure a repository (to ensure a secure temp location is
 				// used)
-				File repository = (File) context
-						.getAttribute("javax.servlet.context.tempdir");
+				File repository = (File) context.getAttribute("javax.servlet.context.tempdir");
 				System.out.println(repository.getAbsolutePath());
 				factory.setRepository(repository);
 
@@ -112,21 +110,17 @@ public class ImportProductCatalogAction implements IAction {
 					Iterator<FileItem> iter = items.iterator();
 
 					// get and set schema
-					SchemaFactory sFactory = SchemaFactory
-							.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+					SchemaFactory sFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 					Schema bmeCatSchema = null;
 					try {
-						bmeCatSchema = sFactory
-								.newSchema(new File(
-										"C:\\Users\\Simon\\eclipse_workspaces\\workspace_WS13\\htwg.ebut.srck\\WholesalerWebDemo\\files\\bmecat_new_catalog_1_2_simple_V0.96.xsd"));
+						bmeCatSchema = sFactory.newSchema(new File("C:\\Users\\Simon\\eclipse_workspaces\\workspace_WS13\\htwg.ebut.srck\\WholesalerWebDemo\\files\\bmecat_new_catalog_1_2_simple_V0.96.xsd"));
 					} catch (SAXException e1) {
 						// TODO Auto-generated catch block
 						System.out.println("could not create schema.");
 						e1.printStackTrace();
 					}
 					DocumentBuilder xmlBuilder = null;
-					DocumentBuilderFactory dbfactory = DocumentBuilderFactory
-							.newInstance();
+					DocumentBuilderFactory dbfactory = DocumentBuilderFactory.newInstance();
 
 					// set properties
 					dbfactory.setValidating(true);
@@ -152,8 +146,7 @@ public class ImportProductCatalogAction implements IAction {
 					}
 
 					// set ErrorHandler
-					xmlBuilder
-							.setErrorHandler(new org.xml.sax.helpers.DefaultHandler());
+					xmlBuilder.setErrorHandler(new org.xml.sax.helpers.DefaultHandler());
 					xmlBuilder.setEntityResolver(null);
 
 					// koennte null sein
@@ -169,19 +162,16 @@ public class ImportProductCatalogAction implements IAction {
 							InputStream uploadedItemIS = item.getInputStream();
 
 							// parse the input stream and output a w3c document
-							parsedUploadedItem = xmlBuilder
-									.parse(uploadedItemIS);
+							parsedUploadedItem = xmlBuilder.parse(uploadedItemIS);
 							// close input stream
 							uploadedItemIS.close();
 							
 							
-							if (parsedUploadedItem.getFirstChild()
-									.getNodeName() == "BMECAT") {
+							if (parsedUploadedItem.getFirstChild().getNodeName() == "BMECAT") {
 								// validate parsed file, will throw exception if
 								// not
 								// valid
-								bmeCatSchema.newValidator().validate(
-										new DOMSource(parsedUploadedItem));
+								bmeCatSchema.newValidator().validate(new DOMSource(parsedUploadedItem));
 							} else {
 								errorList.add("File is not a BMECat format!");
 								return "import.jsp";
@@ -197,8 +187,7 @@ public class ImportProductCatalogAction implements IAction {
 							e.printStackTrace();
 							return "import.jsp";
 						} catch (IOException e) {
-							System.out
-									.println("Could not parse to w3c document.");
+							System.out.println("Could not parse to w3c document.");
 							e.printStackTrace();
 						} finally {
 							// for deletion of create item in temp folder,
@@ -306,8 +295,7 @@ public class ImportProductCatalogAction implements IAction {
 
 	@Override
 	public boolean accepts(String actionName) {
-		return actionName
-				.equalsIgnoreCase(Constants.ACTION_IMPORT_SUPPLIER_PRODUCTS);
+		return actionName.equalsIgnoreCase(Constants.ACTION_IMPORT_SUPPLIER_PRODUCTS);
 	}
 
 }
