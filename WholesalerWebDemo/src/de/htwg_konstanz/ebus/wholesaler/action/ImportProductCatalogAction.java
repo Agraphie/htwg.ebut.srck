@@ -284,12 +284,13 @@ public class ImportProductCatalogAction implements IAction {
 					product = setArticleDetails(currentNode, product);
 				}else if (Constants.ARTICLE_CHILD_ARTICLE_ORDER_DETAILS.equals(currentNodeName)){
 					product = setArticleOrderDetails(currentNode, product);
+				}else if (Constants.ARTICLE_CHILD_ARTICLE_REFERENCE.equals(currentNodeName)){
+					//TODO: referencen auf andere produkte
 				}else if (Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS.equals(currentNodeName)){
+					//the salesprice needs a product-intance, therefore persist the current product!
 					product.setSupplier(supplier);
 					ProductBOA.getInstance().saveOrUpdate(product);
 					setArticlePriceDetails(currentNode, product);
-				}else if (Constants.ARTICLE_CHILD_ARTICLE_REFERENCE.equals(currentNodeName)){
-					
 				}
 			}
 
@@ -313,11 +314,12 @@ public class ImportProductCatalogAction implements IAction {
 					if(Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_PRICE_AMOUNT.equals(nodeName)){
 						salesPrice.setAmount(new BigDecimal(textContent));
 					}else if(Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_PRICE_CURRENCY.equals(nodeName)){
-						//FIXME: Load default currency of territory?!
+						//FIXME: not necessary - load default currency of territory?!
 					}else if(Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_TAX.equals(nodeName)){
 						salesPrice.setTaxrate(new BigDecimal(textContent));
 					}else if(Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_TERRITORY.equals(nodeName)){
-						 //load a country
+						 //load corresponding country
+						//FIXME: Es ist möglich dass der bmecat mehrere <TERRITORY> elemente enthalten kann. es müssten dann also mehrere preisobjekte erstellt werden?!
 						BOCountry country = CountryBOA.getInstance().findCountry(textContent);
 						salesPrice.setCountry(country);
 					}
