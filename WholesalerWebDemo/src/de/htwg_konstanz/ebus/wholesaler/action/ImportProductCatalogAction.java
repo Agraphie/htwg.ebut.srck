@@ -56,7 +56,7 @@ public class ImportProductCatalogAction implements IAction {
 	private static final String PARAM_LOGIN_BEAN = "loginBean";
 	private static final String PARAM_PRODUCT_LIST = "productList";
 	private static final String ATTRIBUTE_PRICE_TYPE = "price_type";
-	
+	private static XPathFactory xpFactory;
 	
 
 	@Override
@@ -75,52 +75,9 @@ public class ImportProductCatalogAction implements IAction {
 			if (Security.getInstance().isUserAllowed(loginBean.getUser(), Security.RESOURCE_ALL, Security.ACTION_READ))
 			{
 				//get the supplier id and supplier
-				int supplierID = loginBean.getUser().getId();	
-				BOUserSupplier sup = UserBOA.getInstance().findUserSupplierById(supplierID);
-				BOSupplier endSupplier = null;
-				List<BOSupplier> sersup = SupplierBOA.getInstance().findAll();
-				Iterator<BOSupplier> it = sersup.listIterator();
-				while(it.hasNext()){
-					endSupplier = it.next();
-					if(endSupplier.getAddress().getId() == sup.getOrganization().getAddress().getId()){
-						break;
-					}
-				}
+				BOSupplier endSupplier = supplierFinder(loginBean);
 				
-				//get context from session, need to think about that
-				ServletContext context = request.getSession().getServletContext();
-				
-				//get FileCleaningTracker, tracking files saved to a temp dir
-				FileCleaningTracker fileCleaningTracker = FileCleanerCleanup.getFileCleaningTracker(context);
-				//beyond this value (in bytes) all files will be written to a temp dir
-
-				int yourMaxMemorySize = 1000;
-				// Create a factory for disk-based file items
-				DiskFileItemFactory factory = new DiskFileItemFactory();
-
-				// Set factory constraints
-				factory.setSizeThreshold(yourMaxMemorySize);
-
-				// set FileCleaningtracker
-				factory.setFileCleaningTracker(fileCleaningTracker);
-				// Configure a repository (to ensure a secure temp location is
-				// used)
-				File repository = (File) context.getAttribute("javax.servlet.context.tempdir");
-				System.out.println(repository.getAbsolutePath());
-				factory.setRepository(repository);
-
-				// Create a new file upload handler
-				ServletFileUpload upload = new ServletFileUpload(factory);
-
-
-				// Parse the request
-				List<FileItem> items = null;
-				try {
-					items = upload.parseRequest(request);
-				} catch (FileUploadException e) {
-					System.out.println("Could not parse upload request.");
-					e.printStackTrace();
-				}
+				List<FileItem> items = fileUploadParser(request);
 
 				if (items != null) {
 					Iterator<FileItem> iter = items.iterator();
@@ -129,28 +86,16 @@ public class ImportProductCatalogAction implements IAction {
 					SchemaFactory sFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 					Schema bmeCatSchema = null;
 					try {
-						bmeCatSchema = sFactory.newSchema(new File("C:\\Users\\Simon\\eclipse_workspaces\\workspace_WS13\\htwg.ebut.srck\\WholesalerWebDemo\\files\\bmecat_new_catalog_1_2_simple_V0.96.xsd"));
+						bmeCatSchema = sFactory.newSchema(new File("C:\\temp\\bmecat_new_catalog_1_2_simple_V0.96.xsd"));
 
 					} catch (SAXException e1) {
-						// TODO Auto-generated catch block
+						errorList.add("No XML schema found!");
 						System.out.println("could not create schema.");
 						e1.printStackTrace();
+						return "import.jsp";
 					}
 					DocumentBuilder xmlBuilder = null;
-					DocumentBuilderFactory dbfactory = DocumentBuilderFactory.newInstance();
-
-					// set properties
-					dbfactory.setValidating(true);
-					dbfactory.setExpandEntityReferences(true);
-					dbfactory.setIgnoringElementContentWhitespace(true);
-
-					// this will allow namespaces to be specified in the xml
-					// documents
-					dbfactory.setNamespaceAware(true);
-
-					dbfactory.setSchema(bmeCatSchema);
-					dbfactory.setIgnoringComments(true);
-					dbfactory.setXIncludeAware(false);
+					DocumentBuilderFactory dbfactory = documentBuilderFactory(bmeCatSchema);
 
 					try {
 						xmlBuilder = dbfactory.newDocumentBuilder();
@@ -200,6 +145,7 @@ public class ImportProductCatalogAction implements IAction {
 							e.printStackTrace();
 							return "import.jsp";
 						} catch (IOException e) {
+							errorList.add("Could not parse to w3c document!");
 							System.out.println("Could not parse to w3c document.");
 							e.printStackTrace();
 						} finally {
@@ -214,7 +160,7 @@ public class ImportProductCatalogAction implements IAction {
 						
 						//return type is nodeSet with all Articles. Cool right? XPath value could be everything
 						// get XPath factory
-						XPathFactory xpFactory = XPathFactory.newInstance();
+						xpFactory = XPathFactory.newInstance();
 						NodeList articles = (NodeList) xpFactory.newXPath().evaluate("/BMECAT/T_NEW_CATALOG/ARTICLE", parsedUploadedItem, XPathConstants.NODESET);
 						createAndPersistArticles(articles, endSupplier);
 
@@ -266,13 +212,101 @@ public class ImportProductCatalogAction implements IAction {
 			return "login.jsp";
 	}
 
+	private DocumentBuilderFactory documentBuilderFactory(Schema bmeCatSchema) {
+		DocumentBuilderFactory dbfactory = DocumentBuilderFactory.newInstance();
+
+		// set properties
+		dbfactory.setValidating(true);
+		dbfactory.setExpandEntityReferences(true);
+		dbfactory.setIgnoringElementContentWhitespace(true);
+
+		// this will allow namespaces to be specified in the xml
+		// documents
+		dbfactory.setNamespaceAware(true);
+
+		dbfactory.setSchema(bmeCatSchema);
+		dbfactory.setIgnoringComments(true);
+		dbfactory.setXIncludeAware(false);
+		return dbfactory;
+	}
+
+	private List<FileItem> fileUploadParser(HttpServletRequest request) {
+		//get context from session, need to think about that
+		ServletContext context = request.getSession().getServletContext();
+		
+		//get FileCleaningTracker, tracking files saved to a temp dir
+		FileCleaningTracker fileCleaningTracker = FileCleanerCleanup.getFileCleaningTracker(context);
+		//beyond this value (in bytes) all files will be written to a temp dir
+
+		int yourMaxMemorySize = 1000;
+		// Create a factory for disk-based file items
+		DiskFileItemFactory factory = new DiskFileItemFactory();
+
+		// Set factory constraints
+		factory.setSizeThreshold(yourMaxMemorySize);
+
+		// set FileCleaningtracker
+		factory.setFileCleaningTracker(fileCleaningTracker);
+		// Configure a repository (to ensure a secure temp location is
+		// used)
+		File repository = (File) context.getAttribute("javax.servlet.context.tempdir");
+		factory.setRepository(repository);
+
+		// Create a new file upload handler
+		ServletFileUpload upload = new ServletFileUpload(factory);
+
+
+		// Parse the request
+		List<FileItem> items = null;
+		try {
+			items = upload.parseRequest(request);
+		} catch (FileUploadException e) {
+			System.out.println("Could not parse upload request.");
+			e.printStackTrace();
+		}
+		return items;
+	}
+
+	private BOSupplier supplierFinder(LoginBean loginBean) {
+		int supplierID = loginBean.getUser().getId();	
+		BOUserSupplier sup = UserBOA.getInstance().findUserSupplierById(supplierID);
+		BOSupplier endSupplier = null;
+		List<BOSupplier> sersup = SupplierBOA.getInstance().findAll();
+		Iterator<BOSupplier> it = sersup.listIterator();
+		while(it.hasNext()){
+			endSupplier = it.next();
+			if(endSupplier.getAddress().getId() == sup.getOrganization().getAddress().getId()){
+				break;
+			}
+		}
+		return endSupplier;
+	}
+
 	private void createAndPersistArticles(NodeList articles, BOSupplier supplier) {
 		//iterate over the nodeset and get _all_ the contens!
 		for (int i = 0; i < articles.getLength(); i++) {
 			Element currentArticle = (Element) articles.item(i);
 			NodeList currentArticleChilds = currentArticle.getChildNodes();
+			String productEAN = "";
+			try {
+				//query the current article and get it's EAN
+				productEAN = (String) xpFactory.newXPath().evaluate("ARTICLE_DETAILS/EAN", currentArticle, XPathConstants.STRING);
+			} catch (XPathExpressionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			//declare a product
+			BOProduct product;
 			
-		    BOProduct product = new BOProduct();
+		    //TODO if update product, search for which criteria? Materialnumber is set by the database (or hibernate?)
+			// product would be null if the EAN is not found.
+			product = ProductBOA.getInstance().findByOrderNumberSupplier(productEAN);
+			
+			if(product == null){
+				//initiate new product if no product was found above
+				product = new BOProduct();
+			}
 
 			for(int j = 0; j < currentArticleChilds.getLength(); j++){
 				
