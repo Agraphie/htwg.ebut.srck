@@ -21,6 +21,7 @@ import de.htwg_konstanz.ebus.wholesaler.demo.IAction;
 import de.htwg_konstanz.ebus.wholesaler.demo.LoginBean;
 import de.htwg_konstanz.ebus.wholesaler.demo.util.Constants;
 import de.htwg_konstanz.ebus.wholesaler.main.Importer;
+import de.htwg_konstanz.ebus.wholesaler.main.ProductFinderUtil;
 
 public class ImportProductCatalogAction implements IAction {
 
@@ -36,18 +37,12 @@ public class ImportProductCatalogAction implements IAction {
 
 		// ensure that the user is logged in
 		if (loginBean != null && loginBean.isLoggedIn()) {
-			// ensure that the user is allowed to execute this action
-			// (authorization)
-			// at this time the authorization is not fully implemented.
-
-			// -> use the "Security.RESOURCE_ALL" constant which includes all
-			// resources.
-			Importer importStarter = new Importer();
-
+			// ensure that the user is allowed to execute this action (authorization) at this time the authorization is not fully implemented.
+			// -> use the "Security.RESOURCE_ALL" constant which includes all resources.
 			if (Security.getInstance().isUserAllowed(loginBean.getUser(),Security.RESOURCE_ALL, Security.ACTION_READ)) {
 				
 				try {
-					importStarter.startImport(request, loginBean);
+					new Importer().startImport(request, loginBean);
 				} catch (SAXParseException e) {
 					errorList.add("XML file is not well-formed!");
 					e.printStackTrace();
@@ -65,7 +60,7 @@ public class ImportProductCatalogAction implements IAction {
 					e.printStackTrace();
 				}
 
-				List<BOProduct> productList = findProductsForCurrentSupplier(loginBean, importStarter);
+				List<BOProduct> productList = ProductFinderUtil.findProductsForSupplier(loginBean);
 				// now set the right list to the session
 				request.getSession(true).setAttribute(PARAM_PRODUCT_LIST,productList);
 
@@ -82,34 +77,9 @@ public class ImportProductCatalogAction implements IAction {
 			return "login.jsp";
 	}
 
-	private List<BOProduct> findProductsForCurrentSupplier(LoginBean loginBean, Importer importStarter) {
-		// find all available products for current Supplier and put it
-		// to the session
-		// now with our new products so a realoading of the site won't
-		// be necessary!
-		// Use temp list to save all the products which belong to the
-		// logged in supplier
-		List<BOProduct> productList = ProductBOA.getInstance().findAll();
-
-		List<BOProduct> productListTemp = new LinkedList<BOProduct>();
-		Iterator<BOProduct> iterator = productList.iterator();
-		BOProduct productTemp;
-		BOSupplier endsupplier = importStarter
-				.supplierFinder(loginBean);
-		while (iterator.hasNext()) {
-			productTemp = iterator.next();
-			if (productTemp.getSupplier().getSupplierNumber() == endsupplier
-					.getSupplierNumber()) {
-				productListTemp.add(productTemp);
-			}
-		}
-		return productListTemp;
-	}
-
 	@Override
 	public boolean accepts(String actionName) {
-		return actionName
-				.equalsIgnoreCase(Constants.ACTION_IMPORT_SUPPLIER_PRODUCTS);
+		return actionName.equalsIgnoreCase(Constants.ACTION_IMPORT_SUPPLIER_PRODUCTS);
 	}
 
 }

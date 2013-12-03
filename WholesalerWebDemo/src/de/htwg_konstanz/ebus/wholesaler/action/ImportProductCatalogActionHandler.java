@@ -18,6 +18,7 @@ import de.htwg_konstanz.ebus.framework.wholesaler.api.security.Security;
 import de.htwg_konstanz.ebus.wholesaler.demo.IAction;
 import de.htwg_konstanz.ebus.wholesaler.demo.LoginBean;
 import de.htwg_konstanz.ebus.wholesaler.demo.util.Constants;
+import de.htwg_konstanz.ebus.wholesaler.main.ProductFinderUtil;
 
 public class ImportProductCatalogActionHandler implements IAction {
 
@@ -39,37 +40,8 @@ public class ImportProductCatalogActionHandler implements IAction {
 			// -> use the "Security.RESOURCE_ALL" constant which includes all resources.
 			if (Security.getInstance().isUserAllowed(loginBean.getUser(), Security.RESOURCE_ALL, Security.ACTION_READ))
 			{
-				// redirect to the product page
-				//TODO: FOR CURRENT SUPPLIER
-				List<BOProduct> productList = ProductBOA.getInstance().findAll();
-				//get the supplier id and supplier
-				int supplierID = loginBean.getUser().getId();	
-				BOUserSupplier sup = UserBOA.getInstance().findUserSupplierById(supplierID);
-				BOSupplier endSupplier = null;
-				List<BOSupplier> sersup = SupplierBOA.getInstance().findAll();
-				Iterator<BOSupplier> it = sersup.listIterator();
-				while(it.hasNext()){
 
-					endSupplier = it.next();
-					if(endSupplier.getAddress().getId() == sup.getOrganization().getAddress().getId())
-					{
-						break;
-					}
-				}
-				// find all available products for current Suppllier and put it to the session
-				//TODO: FOR CURRENT SUPPLIER
-				//Use temp list to save all the products which belong to the logged in supplier
-				List<BOProduct> productListTemp = new LinkedList<BOProduct>();
-				Iterator<BOProduct> iterator = productList.iterator();
-				BOProduct productTemp;
-				while(iterator.hasNext()){
-					productTemp = iterator.next();
-					if(productTemp.getSupplier().getSupplierNumber() == endSupplier.getSupplierNumber()){
-						productListTemp.add(productTemp);
-					}
-				}
-				//now set the right list to the temp list
-				productList = productListTemp;
+				List<BOProduct> productList = ProductFinderUtil.findProductsForSupplier(loginBean);
 				request.getSession(true).setAttribute(PARAM_PRODUCT_LIST, productList);	
 				
 				return "import.jsp";
