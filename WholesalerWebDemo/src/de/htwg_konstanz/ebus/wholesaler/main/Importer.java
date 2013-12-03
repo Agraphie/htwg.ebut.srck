@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -165,10 +166,10 @@ public class Importer {
 		for (int i = 0; i < articles.getLength(); i++) {
 			Element currentArticle = (Element) articles.item(i);
 			NodeList currentArticleChilds = currentArticle.getChildNodes();
-			String productEAN = "";
+			String supplierAID = "";
 			try {
-				// query the current article and get it's EAN
-				productEAN = (String) xpFactory.newXPath().evaluate("SUPPLIER_AID", currentArticle,	XPathConstants.STRING);
+				// query the current article and get it's S_AID
+				supplierAID = (String) xpFactory.newXPath().evaluate("SUPPLIER_AID", currentArticle,	XPathConstants.STRING);
 			} catch (XPathExpressionException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -177,10 +178,10 @@ public class Importer {
 			// declare a product
 			BOProduct product;
 
-			// TODO if update product, search for which criteria? Materialnumber
+			// if update product, search for which criteria? Materialnumber
 			// is set by the database (or hibernate?)
 			// product would be null if the EAN is not found.
-			product = ProductBOA.getInstance().findByOrderNumberSupplier(productEAN);
+			product = ProductBOA.getInstance().findByOrderNumberSupplier(supplierAID);
 
 			if (product == null) {
 				// initiate new product if no product was found above
@@ -253,6 +254,9 @@ public class Importer {
 	 */
 
 	private void setArticlePriceDetails(Element currentNode, BOProduct product) {
+		//List with all persisted prices for this article
+		//in case an article has several equal prices
+		HashSet<Object> persistedPrices = new HashSet<Object>();
 		NodeList articlePrices = fetchArticlePrices(currentNode);
 		for (int i = 0; i < articlePrices.getLength(); i++) {
 			// create a sales/purchase price
@@ -272,27 +276,34 @@ public class Importer {
 					if (Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_PRICE_AMOUNT.equals(nodeName)) {
 						amount = new BigDecimal(textContent);
 					} else if (Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_PRICE_CURRENCY.equals(nodeName)) {
-						// FIXME: not necessary - load default currency of territory?!
+						// not necessary - load default currency of territory
 					} else if (Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_TAX.equals(nodeName)) {
 						taxrate = new BigDecimal(textContent);
 					} else if (Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_TERRITORY.equals(nodeName)) {
 						// load corresponding country
-						// FIXME: Es ist möglich dass der bmecat mehrere <TERRITORY> elemente enthalten kann. es müssten dann also mehrere preisobjekte erstellt werden?!
 						country = CountryBOA.getInstance().findCountry(textContent);
 					}	
 					if(articlePriceDetailsNotNull(amount, taxrate, country)){
 						BOSalesPrice salesPrice = new BOSalesPrice(increaseSalesPrice(amount), taxrate, priceType);
 						salesPrice.setCountry(country);
 						salesPrice.setProduct(product);
-						// FIXME: information fehlt uns im bmecat?
 						salesPrice.setLowerboundScaledprice(new Integer(1));
-						PriceBOA.getInstance().saveOrUpdateSalesPrice(salesPrice);
+						
+						//TODO Bugfix
+						if(!persistedPrices.contains(salesPrice)){
+							PriceBOA.getInstance().saveOrUpdateSalesPrice(salesPrice);
+							persistedPrices.add(salesPrice);
+						}
 						
 						BOPurchasePrice purchasePrice = new BOPurchasePrice(amount, taxrate, priceType);
 						purchasePrice.setCountry(country);
 						purchasePrice.setProduct(product);						
 						purchasePrice.setLowerboundScaledprice(new Integer(1));
-						PriceBOA.getInstance().saveOrUpdatePurchasePrice(purchasePrice);
+						if(!persistedPrices.contains(purchasePrice)){
+							PriceBOA.getInstance().saveOrUpdatePurchasePrice(purchasePrice);
+							persistedPrices.add(purchasePrice);
+						}
+						
 					}
 				}
 			}
@@ -344,9 +355,9 @@ public class Importer {
 			if (textContentNotNull(childNode)) {
 				String textContent = childNode.getTextContent();
 				if (Constants.ARTICLE_CHILD_ARTICLE_ORDER_DETAILS_NO_CU_PER_OUT.equals(nodeName)) {
-					// TODO: WORAUF setzen?
+					// not necessary
 				} else if (Constants.ARTICLE_CHILD_ARTICLE_ORDER_DETAILS_ORDER_UNIT.equals(nodeName)) {
-					// TODO: WORAUF setzen?
+					// not necessary
 				}
 			}
 		}
@@ -374,10 +385,11 @@ public class Importer {
 					product.setShortDescription(textContent);
 					product.setShortDescriptionCustomer(textContent);
 				} else if (Constants.ARTICLE_CHILD_ARTICLE_DETAILS_EAN.equals(nodeName)) {
-					product.setOrderNumberCustomer(textContent);
-					// product.setOrderNumberSupplier(textContent);
+					//zusätzlcihe artikelnummern werden nicht berücksichtigt
+					//ean ist nicht immer vorhanden, nehme S_AID
+					//product.setOrderNumberCustomer(textContent);
+					//product.setOrderNumberSupplier(textContent);
 				}
-				// TODO: wohin mit zusätzlichen Artikelnummern?
 			}
 		}
 		return product;
@@ -393,6 +405,7 @@ public class Importer {
 	private BOProduct setSupplierAID(Node currentNode, BOProduct product) {
 		if (textContentNotNull(currentNode)) {
 			product.setOrderNumberSupplier(currentNode.getTextContent());
+			product.setOrderNumberCustomer(currentNode.getTextContent());
 		}
 		return product;
 	}
