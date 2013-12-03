@@ -2,8 +2,6 @@ package de.htwg_konstanz.ebus.wholesaler.action;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,14 +12,13 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOProduct;
-import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOSupplier;
-import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.ProductBOA;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.security.Security;
 import de.htwg_konstanz.ebus.wholesaler.demo.IAction;
 import de.htwg_konstanz.ebus.wholesaler.demo.LoginBean;
 import de.htwg_konstanz.ebus.wholesaler.demo.util.Constants;
 import de.htwg_konstanz.ebus.wholesaler.main.Importer;
 import de.htwg_konstanz.ebus.wholesaler.main.ProductFinderUtil;
+import de.htwg_konstanz.ebus.wholesaler.main.TooManyPricesForOneCountryException;
 
 public class ImportProductCatalogAction implements IAction {
 
@@ -51,7 +48,11 @@ public class ImportProductCatalogAction implements IAction {
 					errorList.add("XML file is not valid!");
 					e.printStackTrace();
 					return "import.jsp";
-				} catch (IOException e) {
+				} catch (TooManyPricesForOneCountryException e) {
+					errorList.add("Only one price per country per article is allowed!");
+					System.out.println("Too many price attributes.");
+					e.printStackTrace();
+				}catch (IOException e) {
 					errorList.add("Could not parse to w3c document!");
 					System.out.println("Could not parse to w3c document.");
 					e.printStackTrace();
