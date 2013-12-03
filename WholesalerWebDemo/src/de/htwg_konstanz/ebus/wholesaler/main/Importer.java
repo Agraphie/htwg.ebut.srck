@@ -102,14 +102,14 @@ public class Importer {
 
 			// parse the input stream and output a w3c document
 			parsedUploadedItem = xmlBuilder.parse(uploadedItemIS);
+			xmlBuilder.reset();
 			// close input stream
 			uploadedItemIS.close();
 		}
 		return parsedUploadedItem;
 	}
 
-	private DocumentBuilder getXMLBuilder(Schema bmeCatSchema) throws SAXParseException
-			 {
+	private DocumentBuilder getXMLBuilder(Schema bmeCatSchema) throws SAXParseException {
 		DocumentBuilder xmlBuilder = null;
 		DocumentBuilderFactory dbfactory = documentBuilderFactory(bmeCatSchema);
 
@@ -152,6 +152,13 @@ public class Importer {
 		dbfactory.setXIncludeAware(false);
 		return dbfactory;
 	}
+	
+	/**
+	 * Create and persist articles
+	 * 
+	 * @param articles contains uploaded articles 
+	 * @param supplier logged-in supplier
+	 */
 
 	public void createAndPersistArticles(NodeList articles, BOSupplier supplier) {
 		// iterate over the nodeset and get _all_ the contens!
@@ -193,8 +200,7 @@ public class Importer {
 				} else if (Constants.ARTICLE_CHILD_ARTICLE_REFERENCE.equals(currentNodeName)) {
 					createReferenceToOtherProducts(currentNode, product);
 				} else if (Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS.equals(currentNodeName)) {
-					// the salesprice needs a product-intance, therefore persist
-					// the current product!
+					// the salesprice needs a product-intance, therefore persist the the current product before then
 					product.setSupplier(supplier);
 					ProductBOA.getInstance().saveOrUpdate(product);
 					setArticlePriceDetails(currentNode, product);
@@ -203,6 +209,13 @@ public class Importer {
 
 		}
 	}
+	
+	/**
+	 * Create references to other products
+	 * 
+	 * @param currentNode in that case <ARTICLE_REFERENCE>
+	 * @param product
+	 */
 
 	private void createReferenceToOtherProducts(Element currentNode, BOProduct product){
 		
@@ -224,13 +237,20 @@ public class Importer {
 				referencePK.setReferencedproduct(referencedProduct);
 				reference.setId(referencePK);
 				reference.setQuantity(1);
-				//reference.setReferencetype(referencetype);
+				reference.setReferencetype(referenceType);
 				//reference.setRemark(remark);
 				
 				ProductreferenceVOA.getInstance().saveOrUpdate(reference);
 			}
 		}	
 	}
+	
+	/**
+	 * Create/persist the sales- and purchaseprice. 
+	 * 
+	 * @param currentNode in that case <ARTICLE_PRICE_DETAILS>
+	 * @param product every price needs a product!
+	 */
 
 	private void setArticlePriceDetails(Element currentNode, BOProduct product) {
 		NodeList articlePrices = fetchArticlePrices(currentNode);
@@ -296,6 +316,7 @@ public class Importer {
 	/**
 	 * Das Element <ARTICLE_PRICE_DETAILS> hat kinder und kindeskinder. um noch
 	 * eine doppelte for-schleife zu vermeiden mittels xpFactory geholt! y0?
+	 * 
 	 */
 	private NodeList fetchArticlePrices(Element currentNode) {
 		try {
@@ -311,10 +332,8 @@ public class Importer {
 	/**
 	 * Set ArticleOrderDetails on product?!
 	 * 
-	 * @param currentNode
-	 *            in that case <ARTICLE_ORDER_DETAILS>
-	 * @param currentProduct
-	 *            instance
+	 * @param currentNode in that case <ARTICLE_ORDER_DETAILS>
+	 * @param currentProduct 
 	 * 
 	 */
 	private BOProduct setArticleOrderDetails(Node currentNode, BOProduct product) {
@@ -335,7 +354,7 @@ public class Importer {
 	}
 
 	/**
-	 * Set ArticleDetails on product E.g. long and
+	 * Set article details on product e.g. long and
 	 * shortdescription(supplier+costumer) and additional articlenumbers ...
 	 * 
 	 * @param currentNode	in that case <ARTICLE_DETAILS>
@@ -379,7 +398,7 @@ public class Importer {
 	}
 
 	/**
-	 * Get childnodes ...
+	 * Get childnodes of transfer parameter
 	 */
 	private NodeList getChildNodes(Node currentNode) {
 		return currentNode.getChildNodes();
@@ -391,6 +410,14 @@ public class Importer {
 	private boolean textContentNotNull(Node node) {
 		return node.getTextContent() != null;
 	}
+	
+	
+	/**
+	 * Fileupload
+	 * 
+	 * @param request
+	 * @return
+	 */
 
 	private List<FileItem> fileUploadParser(HttpServletRequest request) {
 		// get context from session, need to think about that
@@ -400,12 +427,12 @@ public class Importer {
 		FileCleaningTracker fileCleaningTracker = FileCleanerCleanup.getFileCleaningTracker(context);
 		// beyond this value (in bytes) all files will be written to a temp dir
 
-		int yourMaxMemorySize = 1000;
+		int maxMemorySize = 1000;
 		// Create a factory for disk-based file items
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 
 		// Set factory constraints
-		factory.setSizeThreshold(yourMaxMemorySize);
+		factory.setSizeThreshold(maxMemorySize);
 
 		// set FileCleaningtracker
 		factory.setFileCleaningTracker(fileCleaningTracker);
@@ -427,11 +454,20 @@ public class Importer {
 		}
 		return items;
 	}
+	
+	/**
+	 * Compare on basis of the address, so we find the logged-in supplier.
+	 * Returns the logged-in supplier as {@link BOSupplier}. 
+	 * 
+	 * @param loginBean 
+	 * @return endSupplier logged-in supplier
+	 */
 
 	public BOSupplier supplierFinder(LoginBean loginBean) {
 		int supplierID = loginBean.getUser().getId();
 		BOUserSupplier sup = UserBOA.getInstance().findUserSupplierById(supplierID);
 		BOSupplier endSupplier = null;
+		//not nice but rare
 		List<BOSupplier> sersup = SupplierBOA.getInstance().findAll();
 		Iterator<BOSupplier> it = sersup.listIterator();
 		while (it.hasNext()) {
