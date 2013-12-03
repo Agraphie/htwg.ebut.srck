@@ -18,6 +18,7 @@ import de.htwg_konstanz.ebus.wholesaler.demo.LoginBean;
 import de.htwg_konstanz.ebus.wholesaler.demo.util.Constants;
 import de.htwg_konstanz.ebus.wholesaler.main.Importer;
 import de.htwg_konstanz.ebus.wholesaler.main.ProductFinderUtil;
+import de.htwg_konstanz.ebus.wholesaler.main.TooManyPricesForOneCountryException;
 
 public class ImportProductCatalogAction implements IAction {
 
@@ -47,7 +48,11 @@ public class ImportProductCatalogAction implements IAction {
 					errorList.add("XML file is not valid!");
 					e.printStackTrace();
 					return "import.jsp";
-				} catch (IOException e) {
+				} catch (TooManyPricesForOneCountryException e) {
+					errorList.add("Only one price per country per article is allowed!");
+					System.out.println("Too many price attributes.");
+					e.printStackTrace();
+				}catch (IOException e) {
 					errorList.add("Could not parse to w3c document!");
 					System.out.println("Could not parse to w3c document.");
 					e.printStackTrace();

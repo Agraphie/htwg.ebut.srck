@@ -56,7 +56,7 @@ public class Importer {
 	private static final String ATTRIBUTE_TYPE = "type";
 	private static final BigDecimal INCREASE_IN_PRICE = new BigDecimal(2);
 
-	public void startImport(HttpServletRequest request, LoginBean loginBean)throws SAXParseException, SAXException,  IOException, XPathExpressionException {
+	public void startImport(HttpServletRequest request, LoginBean loginBean)throws SAXParseException, SAXException,  IOException, XPathExpressionException, TooManyPricesForOneCountryException {
 		// get the supplier id and supplier
 		BOSupplier endSupplier = SupplierFinderUtil.supplierFinder(loginBean);
 
@@ -128,7 +128,7 @@ public class Importer {
 		// get and set schema
 		SchemaFactory sFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
-		Schema bmeCatSchema = sFactory.newSchema(new File("C:\\Users\\Simon\\eclipse_workspaces\\workspace_WS13\\htwg.ebut.srck\\WholesalerWebDemo\\files\\bmecat_new_catalog_1_2_simple_V0.96.xsd"));
+		Schema bmeCatSchema = sFactory.newSchema(new File("C:\\temp\\bmecat_new_catalog_1_2_simple_V0.96.xsd"));
 		return bmeCatSchema;
 
 	}
@@ -156,9 +156,10 @@ public class Importer {
 	 * 
 	 * @param articles contains uploaded articles 
 	 * @param supplier logged-in supplier
+	 * @throws TooManyPricesForOneCountryException 
 	 */
 
-	public void createAndPersistArticles(NodeList articles, BOSupplier supplier) {
+	public void createAndPersistArticles(NodeList articles, BOSupplier supplier) throws TooManyPricesForOneCountryException {
 		// iterate over the nodeset and get _all_ the contens!
 		for (int i = 0; i < articles.getLength(); i++) {
 			Element currentArticle = (Element) articles.item(i);
@@ -248,12 +249,13 @@ public class Importer {
 	 * 
 	 * @param currentNode in that case <ARTICLE_PRICE_DETAILS>
 	 * @param product every price needs a product!
+	 * @throws TooManyPricesForOneCountryException 
 	 */
 
-	private void setArticlePriceDetails(Element currentNode, BOProduct product) {
+	private void setArticlePriceDetails(Element currentNode, BOProduct product) throws TooManyPricesForOneCountryException{
 		//List with all persisted prices for this article
 		//in case an article has several equal prices
-		HashSet<Object> persistedPrices = new HashSet<Object>();
+		HashSet<String> persistedPricesPerCountry = new HashSet<String>();
 		NodeList articlePrices = fetchArticlePrices(currentNode);
 		for (int i = 0; i < articlePrices.getLength(); i++) {
 			// create a sales/purchase price
@@ -280,27 +282,23 @@ public class Importer {
 						// load corresponding country
 						country = CountryBOA.getInstance().findCountry(textContent);
 					}	
-					if(articlePriceDetailsNotNull(amount, taxrate, country)){
+					if(articlePriceDetailsNotNull(amount, taxrate, country) && !persistedPricesPerCountry.contains(country.getIsocode())){
 						BOSalesPrice salesPrice = new BOSalesPrice(increaseSalesPrice(amount), taxrate, priceType);
 						salesPrice.setCountry(country);
 						salesPrice.setProduct(product);
 						salesPrice.setLowerboundScaledprice(new Integer(1));
 						
 						//TODO Bugfix
-						if(!persistedPrices.contains(salesPrice)){
-							PriceBOA.getInstance().saveOrUpdateSalesPrice(salesPrice);
-							persistedPrices.add(salesPrice);
-						}
+						PriceBOA.getInstance().saveOrUpdateSalesPrice(salesPrice);
+						persistedPricesPerCountry.add(country.getIsocode());
 						
 						BOPurchasePrice purchasePrice = new BOPurchasePrice(amount, taxrate, priceType);
 						purchasePrice.setCountry(country);
 						purchasePrice.setProduct(product);						
 						purchasePrice.setLowerboundScaledprice(new Integer(1));
-						if(!persistedPrices.contains(purchasePrice)){
-							PriceBOA.getInstance().saveOrUpdatePurchasePrice(purchasePrice);
-							persistedPrices.add(purchasePrice);
-						}
-						
+							PriceBOA.getInstance().saveOrUpdatePurchasePrice(purchasePrice);						
+					} else if(articlePriceDetailsNotNull(amount, taxrate, country) && persistedPricesPerCountry.contains(country.getIsocode())){
+						throw new TooManyPricesForOneCountryException("Exception. Yay.");
 					}
 				}
 			}
