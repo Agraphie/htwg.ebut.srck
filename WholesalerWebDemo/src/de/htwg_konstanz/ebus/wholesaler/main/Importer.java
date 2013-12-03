@@ -39,12 +39,9 @@ import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOProduct;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOPurchasePrice;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOSalesPrice;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOSupplier;
-import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOUserSupplier;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.CountryBOA;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.PriceBOA;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.ProductBOA;
-import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.SupplierBOA;
-import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.UserBOA;
 import de.htwg_konstanz.ebus.framework.wholesaler.vo.Product;
 import de.htwg_konstanz.ebus.framework.wholesaler.vo.Productreference;
 import de.htwg_konstanz.ebus.framework.wholesaler.vo.ProductreferencePK;
@@ -61,7 +58,7 @@ public class Importer {
 
 	public void startImport(HttpServletRequest request, LoginBean loginBean)throws SAXParseException, SAXException,  IOException, XPathExpressionException {
 		// get the supplier id and supplier
-		BOSupplier endSupplier = supplierFinder(loginBean);
+		BOSupplier endSupplier = SupplierFinderUtil.supplierFinder(loginBean);
 
 		List<FileItem> items = fileUploadParser(request);
 
@@ -466,29 +463,5 @@ public class Importer {
 			e.printStackTrace();
 		}
 		return items;
-	}
-	
-	/**
-	 * Compare on basis of the address, so we find the logged-in supplier.
-	 * Returns the logged-in supplier as {@link BOSupplier}. 
-	 * 
-	 * @param loginBean 
-	 * @return endSupplier logged-in supplier
-	 */
-
-	public BOSupplier supplierFinder(LoginBean loginBean) {
-		int supplierID = loginBean.getUser().getId();
-		BOUserSupplier sup = UserBOA.getInstance().findUserSupplierById(supplierID);
-		BOSupplier endSupplier = null;
-		//not nice but rare
-		List<BOSupplier> sersup = SupplierBOA.getInstance().findAll();
-		Iterator<BOSupplier> it = sersup.listIterator();
-		while (it.hasNext()) {
-			endSupplier = it.next();
-			if (endSupplier.getAddress().getId() == sup.getOrganization().getAddress().getId()) {
-				break;
-			}
-		}
-		return endSupplier;
 	}
 }

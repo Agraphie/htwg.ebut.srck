@@ -24,7 +24,7 @@ public class ProductFinderUtil {
 		List<BOProduct> productListTemp = new LinkedList<BOProduct>();
 		Iterator<BOProduct> iterator = productList.iterator();
 		BOProduct productTemp;
-		BOSupplier endsupplier = new Importer().supplierFinder(loginBean);
+		BOSupplier endsupplier = SupplierFinderUtil.supplierFinder(loginBean);
 		while (iterator.hasNext()) {
 			productTemp = iterator.next();
 			if (productTemp.getSupplier().getSupplierNumber() == endsupplier.getSupplierNumber()) {
