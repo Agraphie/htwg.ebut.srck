@@ -75,7 +75,7 @@ public class Importer {
 			parsedUploadedItem = parseUploadItem(parsedUploadedItem, items,	xmlBuilder);
 
 			try{
-			bmeCatSchema.newValidator().validate(new DOMSource(parsedUploadedItem));
+				bmeCatSchema.newValidator().validate(new DOMSource(parsedUploadedItem));
 			} catch (SAXParseException e){
 				throw new SAXException();
 			}
@@ -128,7 +128,7 @@ public class Importer {
 		// get and set schema
 		SchemaFactory sFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
-		Schema bmeCatSchema = sFactory.newSchema(new File("C:\\temp\\bmecat_new_catalog_1_2_simple_V0.96.xsd"));
+		Schema bmeCatSchema = sFactory.newSchema(new File("C:\\Users\\Simon\\eclipse_workspaces\\workspace_WS13\\htwg.ebut.srck\\WholesalerWebDemo\\files\\bmecat_new_catalog_1_2_simple_V0.96.xsd"));
 		return bmeCatSchema;
 
 	}
@@ -190,15 +190,15 @@ public class Importer {
 
 				String currentNodeName = currentArticleChilds.item(j).getNodeName();
 				Element currentNode = (Element) currentArticleChilds.item(j);
-				if (Constants.ARTICLE_CHILD_SUPPLIER_AID.equals(currentNodeName)) {
+				if (Constants.ARTICLE_SUPPLIER_AID.equals(currentNodeName)) {
 					product = setSupplierAID(currentNode, product);
-				} else if (Constants.ARTICLE_CHILD_ARTICLE_DETAILS.equals(currentNodeName)) {
+				} else if (Constants.ARTICLE_ARTICLE_DETAILS.equals(currentNodeName)) {
 					product = setArticleDetails(currentNode, product);
-				} else if (Constants.ARTICLE_CHILD_ARTICLE_ORDER_DETAILS.equals(currentNodeName)) {
+				} else if (Constants.ARTICLE_ARTICLE_ORDER_DETAILS.equals(currentNodeName)) {
 					product = setArticleOrderDetails(currentNode, product);
-				} else if (Constants.ARTICLE_CHILD_ARTICLE_REFERENCE.equals(currentNodeName)) {
+				} else if (Constants.ARTICLE_ARTICLE_REFERENCE.equals(currentNodeName)) {
 					createReferenceToOtherProducts(currentNode, product);
-				} else if (Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS.equals(currentNodeName)) {
+				} else if (Constants.ARTICLE_ARTICLE_PRICE_DETAILS.equals(currentNodeName)) {
 					// the salesprice needs a product-intance, therefore persist the the current product before then
 					product.setSupplier(supplier);
 					ProductBOA.getInstance().saveOrUpdate(product);
@@ -229,7 +229,7 @@ public class Importer {
 		for(int i = 0; i < referencen.getLength() ; i++){
 			String nodeName = referencen.item(i).getNodeName();
 			Element node = (Element) referencen.item(i);
-			if (textContentNotNull(node) && Constants.ARTICLE_CHILD_ARTICLE_REFERENCE_ART_ID_TO.equals(nodeName)) {
+			if (textContentNotNull(node) && Constants.ARTICLE_ARTICLE_REFERENCE_ART_ID_TO.equals(nodeName)) {
 				BOProduct tempProduct = ProductBOA.getInstance().findByOrderNumberSupplier(node.getTextContent());
 				Product referencedProduct = ProductVOA.getInstance().get(tempProduct.getMaterialNumber());
 				referencePK.setProduct(pro);
@@ -272,13 +272,13 @@ public class Importer {
 				String nodeName = node.getNodeName();
 				if (textContentNotNull(node)) {
 					String textContent = node.getTextContent();
-					if (Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_PRICE_AMOUNT.equals(nodeName)) {
+					if (Constants.ARTICLE_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_PRICE_AMOUNT.equals(nodeName)) {
 						amount = new BigDecimal(textContent);
-					} else if (Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_PRICE_CURRENCY.equals(nodeName)) {
+					} else if (Constants.ARTICLE_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_PRICE_CURRENCY.equals(nodeName)) {
 						// not necessary - load default currency of territory
-					} else if (Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_TAX.equals(nodeName)) {
+					} else if (Constants.ARTICLE_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_TAX.equals(nodeName)) {
 						taxrate = new BigDecimal(textContent);
-					} else if (Constants.ARTICLE_CHILD_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_TERRITORY.equals(nodeName)) {
+					} else if (Constants.ARTICLE_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_TERRITORY.equals(nodeName)) {
 						// load corresponding country
 						country = CountryBOA.getInstance().findCountry(textContent);
 					}	
@@ -349,9 +349,9 @@ public class Importer {
 			String nodeName = childNode.getNodeName();
 			if (textContentNotNull(childNode)) {
 				String textContent = childNode.getTextContent();
-				if (Constants.ARTICLE_CHILD_ARTICLE_ORDER_DETAILS_NO_CU_PER_OUT.equals(nodeName)) {
+				if (Constants.ARTICLE_ARTICLE_ORDER_DETAILS_NO_CU_PER_OUT.equals(nodeName)) {
 					// not necessary
-				} else if (Constants.ARTICLE_CHILD_ARTICLE_ORDER_DETAILS_ORDER_UNIT.equals(nodeName)) {
+				} else if (Constants.ARTICLE_ARTICLE_ORDER_DETAILS_ORDER_UNIT.equals(nodeName)) {
 					// not necessary
 				}
 			}
@@ -373,13 +373,13 @@ public class Importer {
 			String nodeName = childNode.getNodeName();
 			if (textContentNotNull(childNode)) {
 				String textContent = childNode.getTextContent();
-				if (Constants.ARTICLE_CHILD_ARTICLE_DETAILS_DESCRIPTION_LONG.equals(nodeName)) {
+				if (Constants.ARTICLE_ARTICLE_DETAILS_DESCRIPTION_LONG.equals(nodeName)) {
 					product.setLongDescription(textContent);
 					product.setLongDescriptionCustomer(textContent);
-				} else if (Constants.ARTICLE_CHILD_ARTICLE_DETAILS_DESCRIPTION_SHORT.equals(nodeName)) {
+				} else if (Constants.ARTICLE_ARTICLE_DETAILS_DESCRIPTION_SHORT.equals(nodeName)) {
 					product.setShortDescription(textContent);
 					product.setShortDescriptionCustomer(textContent);
-				} else if (Constants.ARTICLE_CHILD_ARTICLE_DETAILS_EAN.equals(nodeName)) {
+				} else if (Constants.ARTICLE_ARTICLE_DETAILS_EAN.equals(nodeName)) {
 					//zusätzlcihe artikelnummern werden nicht berücksichtigt
 					//ean ist nicht immer vorhanden, nehme S_AID
 					//product.setOrderNumberCustomer(textContent);

@@ -26,11 +26,9 @@ public class ImportProductCatalogAction implements IAction {
 	private static final String PARAM_PRODUCT_LIST = "productList";
 
 	@Override
-	public String execute(HttpServletRequest request,
-			HttpServletResponse response, ArrayList<String> errorList) {
+	public String execute(HttpServletRequest request, HttpServletResponse response, ArrayList<String> errorList) {
 		// get the login bean from the session
-		LoginBean loginBean = (LoginBean) request.getSession(true)
-				.getAttribute(PARAM_LOGIN_BEAN);
+		LoginBean loginBean = (LoginBean) request.getSession(true).getAttribute(PARAM_LOGIN_BEAN);
 
 		// ensure that the user is logged in
 		if (loginBean != null && loginBean.isLoggedIn()) {

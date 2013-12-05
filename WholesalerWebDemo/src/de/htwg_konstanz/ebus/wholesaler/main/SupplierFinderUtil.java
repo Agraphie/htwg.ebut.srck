@@ -11,7 +11,7 @@ import de.htwg_konstanz.ebus.wholesaler.demo.LoginBean;
 
 public class SupplierFinderUtil {
 
-	/**
+	/**TODO SYNCHRONIZED
 	 * Compare on basis of the address, so we find the logged-in supplier.
 	 * Returns the logged-in supplier as {@link BOSupplier}. 
 	 * 

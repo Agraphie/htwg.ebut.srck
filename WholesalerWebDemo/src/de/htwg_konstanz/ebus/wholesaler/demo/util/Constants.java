@@ -64,34 +64,39 @@ public class Constants {
 	public static final int USER_SUPPLIER = 3;
 
 	// new constants
+	
+	//importAction
 	public static final String ACTION_HANDLER_IMPORT_SUPPLIER_PRODUCTS = "importSupplierProductsHandler";
 	public static final String ACTION_IMPORT_SUPPLIER_PRODUCTS = "importSupplierProducts";
 	
+	public static final String ACTION_EXPORT_CUSTOMER_PRODUCTS = "exportCustomerProducts";
+	
+	public static final String ARTICLE = "ARTICLE";
 	//childnodes of article
-	public static final String ARTICLE_CHILD_SUPPLIER_AID = "SUPPLIER_AID";
-	public static final String ARTICLE_CHILD_ARTICLE_DETAILS = "ARTICLE_DETAILS";
-	public static final String ARTICLE_CHILD_ARTICLE_ORDER_DETAILS = "ARTICLE_ORDER_DETAILS";
-	public static final String ARTICLE_CHILD_ARTICLE_PRICE_DETAILS = "ARTICLE_PRICE_DETAILS";
-	public static final String ARTICLE_CHILD_ARTICLE_REFERENCE = "ARTICLE_REFERENCE";
+	public static final String ARTICLE_SUPPLIER_AID = "SUPPLIER_AID";
+	public static final String ARTICLE_ARTICLE_DETAILS = "ARTICLE_DETAILS";
+	public static final String ARTICLE_ARTICLE_ORDER_DETAILS = "ARTICLE_ORDER_DETAILS";
+	public static final String ARTICLE_ARTICLE_PRICE_DETAILS = "ARTICLE_PRICE_DETAILS";
+	public static final String ARTICLE_ARTICLE_REFERENCE = "ARTICLE_REFERENCE";
 	
 	//childnodes  of ARTICLE_CHILD_ARTICLE_DETAILS
-	public static final String ARTICLE_CHILD_ARTICLE_DETAILS_DESCRIPTION_SHORT = "DESCRIPTION_SHORT";
-	public static final String ARTICLE_CHILD_ARTICLE_DETAILS_DESCRIPTION_LONG = "DESCRIPTION_LONG";
-	public static final String ARTICLE_CHILD_ARTICLE_DETAILS_EAN = "EAN";
+	public static final String ARTICLE_ARTICLE_DETAILS_DESCRIPTION_SHORT = "DESCRIPTION_SHORT";
+	public static final String ARTICLE_ARTICLE_DETAILS_DESCRIPTION_LONG = "DESCRIPTION_LONG";
+	public static final String ARTICLE_ARTICLE_DETAILS_EAN = "EAN";
 	
 	//childnodes of ARTICLE_ORDER_DETAILS
-	public static final String ARTICLE_CHILD_ARTICLE_ORDER_DETAILS_ORDER_UNIT = "ORDER_UNIT";
-	public static final String ARTICLE_CHILD_ARTICLE_ORDER_DETAILS_NO_CU_PER_OUT = "NO_CU_PER_OU";
+	public static final String ARTICLE_ARTICLE_ORDER_DETAILS_ORDER_UNIT = "ORDER_UNIT";
+	public static final String ARTICLE_ARTICLE_ORDER_DETAILS_NO_CU_PER_OUT = "NO_CU_PER_OU";
 	
 	//childnodes of ARTICLE_PRICE_DETAILS
-	public static final String ARTICLE_CHILD_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE = "ARTICLE_PRICE/*";
+	public static final String ARTICLE_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE = "ARTICLE_PRICE";
 	//childnodes of ARTICLE_PRICE
-	public static final String ARTICLE_CHILD_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_PRICE_AMOUNT = "PRICE_AMOUNT";
-	public static final String ARTICLE_CHILD_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_PRICE_CURRENCY = "PRICE_CURRENCY";
-	public static final String ARTICLE_CHILD_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_TAX = "TAX";
-	public static final String ARTICLE_CHILD_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_TERRITORY = "TERRITORY";
+	public static final String ARTICLE_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_PRICE_AMOUNT = "PRICE_AMOUNT";
+	public static final String ARTICLE_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_PRICE_CURRENCY = "PRICE_CURRENCY";
+	public static final String ARTICLE_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_TAX = "TAX";
+	public static final String ARTICLE_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_TERRITORY = "TERRITORY";
 	//chilnodes of ARTICLE_REFERENCE
-	public static final String ARTICLE_CHILD_ARTICLE_REFERENCE_ART_ID_TO = "ART_ID_TO";
+	public static final String ARTICLE_ARTICLE_REFERENCE_ART_ID_TO = "ART_ID_TO";
 
 
 
