@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -31,17 +32,19 @@ public class Exporter {
 	private Document doc;
 	private Transformer bumblebee;
 	private Collection<BOProduct> products;
+	private ServletContext context;
 	
-	
-	public Exporter(String shortDescription){
-		init(shortDescription);
+	public Exporter(String shortDescription, ServletContext context){
+		init(shortDescription, context);
 	}
 	
 	public Exporter(){
-		init(null);
+		init(null, null);
 	}
 
-	private void init(String shortDescription) {
+	private void init(String shortDescription, ServletContext context) {
+		this.context = context;
+
 		if(stringNotNull(shortDescription) && !shortDescription.isEmpty()){
 			products = ProductBOA.getInstance().findByShortdescription(shortDescription);
 		}else{
@@ -75,10 +78,10 @@ public class Exporter {
 		doc.appendChild(root);
 		root.appendChild(header);
 		root.appendChild(tNewCatalog);
-		
-		//TODO: Check for valid XMLFile -> necessary?
 
-		File file = new File("C:\\temp\\generatedXML.xml");
+		//TODO: Check for valid XMLFile -> necessary?
+		File repository = (File) context.getAttribute("javax.servlet.context.tempdir");
+		File file = new File(repository.getAbsolutePath() + "\\generatedXML.xml");
 		StreamResult streamResult = new StreamResult(file);
 
 		try {

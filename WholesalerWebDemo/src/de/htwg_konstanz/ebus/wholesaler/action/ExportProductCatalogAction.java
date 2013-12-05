@@ -1,8 +1,13 @@
 package de.htwg_konstanz.ebus.wholesaler.action;
 
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,12 +36,50 @@ public class ExportProductCatalogAction implements IAction{
 					
 //					Boolean flag = (Boolean) request.getAttribute("flag");
 //					if(flag == Boolean.TRUE){
-						Exporter exporter = new Exporter("Bleistift HB");
+						Exporter exporter = new Exporter("Bleistift HB", request.getSession().getServletContext());
 						
 						File file = exporter.buildXMLFile();
 						// now set the file to the session
 						request.getSession(true).setAttribute(PARAM_PRODUCT_FILE,file);	
 //					}
+					String filePath = file.getAbsolutePath();
+					int length   = 0;
+			        ServletOutputStream outStream;
+					try {
+						outStream = response.getOutputStream();
+						ServletContext context = request.getSession().getServletContext();
+				        String mimetype = context.getMimeType(filePath);
+				       
+				        // sets response content type
+				        if (mimetype == null) {
+				            mimetype = "application/octet-stream";
+				        }
+				        response.setContentType(mimetype);
+				        response.setContentLength((int)file.length());
+				        String fileName = (new File(filePath)).getName();
+				       
+				        // sets HTTP header
+				        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+				       
+				        byte[] byteBuffer = new byte[4096];
+				        DataInputStream in = new DataInputStream(new FileInputStream(file));
+				       
+				        // reads the file's bytes and writes them to the response stream
+				        while ((in != null) && ((length = in.read(byteBuffer)) != -1))
+				        {
+				            outStream.write(byteBuffer,0,length);
+				        }
+				       
+				        in.close();
+				        //response is already sent, therefor can't redirect anymore!
+						outStream.close();
+
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			        
+					
 					return "export.jsp";
 				} else {
 					// authorization failed -> show error message

@@ -69,8 +69,10 @@ public class Constants {
 	public static final String ACTION_HANDLER_IMPORT_SUPPLIER_PRODUCTS = "importSupplierProductsHandler";
 	public static final String ACTION_IMPORT_SUPPLIER_PRODUCTS = "importSupplierProducts";
 	
+	//exportAction
 	public static final String ACTION_EXPORT_CUSTOMER_PRODUCTS = "exportCustomerProducts";
-	
+	public static final String ACTION_HANDLER_EXPORT_CUSTOMER_PRODUCTS = "exportCustomerProductsHandler";
+
 	public static final String ARTICLE = "ARTICLE";
 	//childnodes of article
 	public static final String ARTICLE_SUPPLIER_AID = "SUPPLIER_AID";
