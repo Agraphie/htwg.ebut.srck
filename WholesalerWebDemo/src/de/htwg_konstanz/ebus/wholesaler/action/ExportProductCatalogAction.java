@@ -31,9 +31,9 @@ public class ExportProductCatalogAction implements IAction{
 					
 //					Boolean flag = (Boolean) request.getAttribute("flag");
 //					if(flag == Boolean.TRUE){
-						Exporter export = new Exporter();
+						Exporter exporter = new Exporter("Bleistift HB");
 						
-						File file = export.startExport();
+						File file = exporter.buildXMLFile();
 						// now set the file to the session
 						request.getSession(true).setAttribute(PARAM_PRODUCT_FILE,file);	
 //					}

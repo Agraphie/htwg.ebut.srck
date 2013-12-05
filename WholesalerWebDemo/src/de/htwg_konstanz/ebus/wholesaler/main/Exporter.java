@@ -33,12 +33,20 @@ public class Exporter {
 	private Collection<BOProduct> products;
 	
 	
+	public Exporter(String shortDescription){
+		init(shortDescription);
+	}
+	
 	public Exporter(){
-		init();
+		init(null);
 	}
 
-	private void init() {
-		products = ProductBOA.getInstance().findAll();
+	private void init(String shortDescription) {
+		if(stringNotNull(shortDescription) && !shortDescription.isEmpty()){
+			products = ProductBOA.getInstance().findByShortdescription(shortDescription);
+		}else{
+			products = ProductBOA.getInstance().findAll();
+		}
 		try {
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -59,7 +67,7 @@ public class Exporter {
 		
 	}
 
-	public File startExport() {
+	public File buildXMLFile() {
 		Element root = createRootElement();
 		Element header = createHeader();
 		Element tNewCatalog = createTNewCatalog();
@@ -147,17 +155,18 @@ public class Exporter {
 			//Element ean = doc.createElement(Constants.ARTICLE_ARTICLE_DETAILS_EAN);
 			articleDetails = doc.createElement(Constants.ARTICLE_ARTICLE_DETAILS);
 			
+			if(stringNotNull(product.getShortDescription())){
+				Element descriptionShort = doc.createElement(Constants.ARTICLE_ARTICLE_DETAILS_DESCRIPTION_SHORT);
+				descriptionShort.setTextContent(product.getShortDescription());;
+				articleDetails.appendChild(descriptionShort);
+			}
+			
 			if(stringNotNull(product.getLongDescription())){
 				Element descriptionLong = doc.createElement(Constants.ARTICLE_ARTICLE_DETAILS_DESCRIPTION_LONG);
 				descriptionLong.setTextContent(product.getLongDescription());
 				articleDetails.appendChild(descriptionLong);
 			}
 			
-			if(stringNotNull(product.getShortDescription())){
-				Element descriptionShort = doc.createElement(Constants.ARTICLE_ARTICLE_DETAILS_DESCRIPTION_SHORT);
-				descriptionShort.setTextContent(product.getShortDescription());;
-				articleDetails.appendChild(descriptionShort);
-			}
 		}
 		return articleDetails;
 	}
