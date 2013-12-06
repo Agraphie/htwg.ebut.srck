@@ -9,12 +9,14 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -27,36 +29,46 @@ import de.htwg_konstanz.ebus.wholesaler.demo.util.Constants;
 
 public class Exporter {
 	
+	//TODO: Check for valid (generated) XMLFile -> necessary?
+	
 	private static final String ATTRIBUTE_PRICE_TYPE = "price_type";
 	
 	private Document doc;
 	private Transformer bumblebee;
 	private Collection<BOProduct> products;
-	private ServletContext context;
+	private File repository;
 	
-	public Exporter(String shortDescription, ServletContext context){
-		init(shortDescription, context);
+	public Exporter(String shortDescription, ServletContext context, boolean isFormatBMEcat){
+		init(shortDescription, context, isFormatBMEcat);
 	}
 	
 
-	private void init(String shortDescription, ServletContext context) {
-		this.context = context;
+	private void init(String shortDescription, ServletContext context, boolean isFormatBMEcat) {
 
 		if(stringNotNull(shortDescription)){
 			products = ProductBOA.getInstance().findByShortdescription(shortDescription);
 		}else{
 			products = ProductBOA.getInstance().findAll();
 		}
+		
 		try {
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 			doc = docBuilder.newDocument();
 			
 	        TransformerFactory autobots = TransformerFactory.newInstance();
-	        bumblebee = autobots.newTransformer();
-	        //PrettyPrintXML
-	        bumblebee.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-	        bumblebee.setOutputProperty(OutputKeys.INDENT, "yes");
+	        if(isFormatBMEcat){
+		        bumblebee = autobots.newTransformer();
+		        //PrettyPrintXML
+		        bumblebee.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+		        bumblebee.setOutputProperty(OutputKeys.INDENT, "yes");
+	        }else{
+	    		Source xslt = new StreamSource("C:\\temp\\xmlToHtml.xslt");
+	        	bumblebee = autobots.newTransformer(xslt);
+	        }
+	        	
+	        
+			repository = (File) context.getAttribute("javax.servlet.context.tempdir");
 	        	
 		} catch (ParserConfigurationException pce) {
 			pce.printStackTrace();
@@ -67,20 +79,21 @@ public class Exporter {
 		
 	}
 
-	public File buildXMLFile() {
+	private void createDocument() {
 		Element root = createRootElement();
 		Element header = createHeader();
 		Element tNewCatalog = createTNewCatalog();
 		
-		doc.appendChild(root);
 		root.appendChild(header);
 		root.appendChild(tNewCatalog);
-
-		//TODO: Check for valid XMLFile -> necessary?
-		File repository = (File) context.getAttribute("javax.servlet.context.tempdir");
-		File file = new File(repository.getAbsolutePath() + "\\generatedXML.xml");
+		doc.appendChild(root);
+	}
+	
+	
+	public File getBMEcat() {
+		createDocument();
+		File file = new File(repository.getAbsolutePath() + "\\generatedBMEcat.xml");
 		StreamResult streamResult = new StreamResult(file);
-
 		try {
 			//FIXME: koennte racecondition verursachen. entweder methode satic + synchronized machen oder file anders oder wo anders speichern
 			bumblebee.transform(new DOMSource(doc), streamResult);
@@ -88,9 +101,24 @@ public class Exporter {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 		return file;
 	}
+
+
+	public File getXHTML() {
+		
+		File file = new File(repository.getAbsolutePath() + "\\genratedXHTML.html");
+		StreamResult streamResult = new StreamResult(file);
+		try {
+			bumblebee.transform(new DOMSource(doc), streamResult);
+		} catch (TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return file;
+	}
+	
+	
 
 	private Element createRootElement() {
 		Element root = doc.createElement("BMECAT");
@@ -250,5 +278,5 @@ public class Exporter {
 		
 		return header;
 	}
-	
+
 }

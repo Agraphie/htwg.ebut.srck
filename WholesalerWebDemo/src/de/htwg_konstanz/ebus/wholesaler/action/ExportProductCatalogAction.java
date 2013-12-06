@@ -30,22 +30,29 @@ public class ExportProductCatalogAction implements IAction{
 				if (Security.getInstance().isUserAllowed(loginBean.getUser(),Security.RESOURCE_ALL, Security.ACTION_READ)) {
 					
 					String filter = (String) request.getParameter("filter");
-					File file;
-					Exporter exporter;
-					System.out.println(filter);
-					if(filter != ""){
-						exporter = new Exporter(filter, request.getSession().getServletContext());
+					String format = (String) request.getParameter("exportFormat");
+					boolean isFormatBMEcat = format.equals("formatBMEcat") ? true : false;
+					File file = null;
+					Exporter exporter = null;
+					
+					//Search by Shortdesciption 
+					if(!filter.equals("") && filter != null && !filter.equals(" ")){
+						exporter = new Exporter(filter, request.getSession().getServletContext(), isFormatBMEcat);
 						System.out.println("gefiltert");
 					}else{
-						exporter = new Exporter(null,request.getSession().getServletContext());
+						exporter = new Exporter(null,request.getSession().getServletContext(), isFormatBMEcat);
 					}
 					
-					file = exporter.buildXMLFile();
+					//ExportFormat
+					if(isFormatBMEcat){
+						file = exporter.getBMEcat();
 
+					}else{
+						file = exporter.getXHTML();
+					}
+					
 					// now set the file to the session
-					request.getSession(true).setAttribute("file", file);
-					request.getSession(true).setAttribute(PARAM_PRODUCT_FILE,file);	
-		        
+					request.getSession(true).setAttribute("file", file);		        
 					
 					return "export.jsp";
 				} else {
