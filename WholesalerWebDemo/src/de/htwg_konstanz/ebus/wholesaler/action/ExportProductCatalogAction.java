@@ -1,13 +1,8 @@
 package de.htwg_konstanz.ebus.wholesaler.action;
 
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,51 +29,23 @@ public class ExportProductCatalogAction implements IAction{
 				// -> use the "Security.RESOURCE_ALL" constant which includes all resources.
 				if (Security.getInstance().isUserAllowed(loginBean.getUser(),Security.RESOURCE_ALL, Security.ACTION_READ)) {
 					
-//					Boolean flag = (Boolean) request.getAttribute("flag");
-//					if(flag == Boolean.TRUE){
-						Exporter exporter = new Exporter("Bleistift HB", request.getSession().getServletContext());
-						
-						File file = exporter.buildXMLFile();
-						// now set the file to the session
-						request.getSession(true).setAttribute(PARAM_PRODUCT_FILE,file);	
-//					}
-					String filePath = file.getAbsolutePath();
-					int length   = 0;
-			        ServletOutputStream outStream;
-					try {
-						outStream = response.getOutputStream();
-						ServletContext context = request.getSession().getServletContext();
-				        String mimetype = context.getMimeType(filePath);
-				       
-				        // sets response content type
-				        if (mimetype == null) {
-				            mimetype = "application/octet-stream";
-				        }
-				        response.setContentType(mimetype);
-				        response.setContentLength((int)file.length());
-				        String fileName = (new File(filePath)).getName();
-				       
-				        // sets HTTP header
-				        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-				       
-				        byte[] byteBuffer = new byte[4096];
-				        DataInputStream in = new DataInputStream(new FileInputStream(file));
-				       
-				        // reads the file's bytes and writes them to the response stream
-				        while ((in != null) && ((length = in.read(byteBuffer)) != -1))
-				        {
-				            outStream.write(byteBuffer,0,length);
-				        }
-				       
-				        in.close();
-				        //response is already sent, therefor can't redirect anymore!
-						outStream.close();
-
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					String filter = (String) request.getParameter("filter");
+					File file;
+					Exporter exporter;
+					System.out.println(filter);
+					if(filter != ""){
+						exporter = new Exporter(filter, request.getSession().getServletContext());
+						System.out.println("gefiltert");
+					}else{
+						exporter = new Exporter(null,request.getSession().getServletContext());
 					}
-			        
+					
+					file = exporter.buildXMLFile();
+
+					// now set the file to the session
+					request.getSession(true).setAttribute("file", file);
+					request.getSession(true).setAttribute(PARAM_PRODUCT_FILE,file);	
+		        
 					
 					return "export.jsp";
 				} else {

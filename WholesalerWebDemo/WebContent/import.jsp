@@ -38,8 +38,8 @@
 	<%@ include file="navigation.jspfragment"%>
 
 	<h1>Import Product Catalog</h1>
-
-	<form method="POST" enctype="multipart/form-data" action="<%="controllerservlet?action="+ Constants.ACTION_IMPORT_SUPPLIER_PRODUCTS%>">
+	<form method="POST"	enctype="multipart/form-data"  action="<%= response.encodeURL("controllerservlet") %> ">
+		<input type="hidden" name="action" value=Constants.ACTION_IMPORT_SUPPLIER_PRODUCTS>
 		File to upload: <input type="file" name="upfile" id="upfile" onChange="buttonEnable(this)"><br /> <input type="submit" value="Press" id="submit" disabled> to upload the file!
 	</form>
 

@@ -38,14 +38,11 @@ public class Exporter {
 		init(shortDescription, context);
 	}
 	
-	public Exporter(){
-		init(null, null);
-	}
 
 	private void init(String shortDescription, ServletContext context) {
 		this.context = context;
 
-		if(stringNotNull(shortDescription) && !shortDescription.isEmpty()){
+		if(stringNotNull(shortDescription)){
 			products = ProductBOA.getInstance().findByShortdescription(shortDescription);
 		}else{
 			products = ProductBOA.getInstance().findAll();
@@ -218,7 +215,7 @@ public class Exporter {
 	}
 
 	private boolean stringNotNull(String string) {
-		return string != null;
+		return string != null && !string.isEmpty() && !string.equals(" ");
 	}
 
 	private Element createHeader() {
