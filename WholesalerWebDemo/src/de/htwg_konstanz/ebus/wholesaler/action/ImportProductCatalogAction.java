@@ -34,8 +34,8 @@ public class ImportProductCatalogAction implements IAction {
 		if (loginBean != null && loginBean.isLoggedIn()) {
 			// ensure that the user is allowed to execute this action (authorization) at this time the authorization is not fully implemented.
 			// -> use the "Security.RESOURCE_ALL" constant which includes all resources.
-			if (Security.getInstance().isUserAllowed(loginBean.getUser(),Security.RESOURCE_ALL, Security.ACTION_READ)) {
-				
+			if (Security.getInstance().isUserAllowed(loginBean.getUser(), Security.RESOURCE_ALL, Security.ACTION_READ)) {
+
 				try {
 					new Importer().startImport(request, loginBean);
 				} catch (SAXParseException e) {
@@ -50,7 +50,7 @@ public class ImportProductCatalogAction implements IAction {
 					errorList.add("Only one price per country per article is allowed!");
 					System.out.println("Too many price attributes.");
 					e.printStackTrace();
-				}catch (IOException e) {
+				} catch (IOException e) {
 					errorList.add("Could not parse to w3c document!");
 					System.out.println("Could not parse to w3c document.");
 					e.printStackTrace();
@@ -61,7 +61,7 @@ public class ImportProductCatalogAction implements IAction {
 
 				List<BOProduct> productList = ProductFinderUtil.findProductsForSupplier(loginBean);
 				// now set the right list to the session
-				request.getSession(true).setAttribute(PARAM_PRODUCT_LIST,productList);
+				request.getSession(true).setAttribute(PARAM_PRODUCT_LIST, productList);
 
 				return "import.jsp";
 			} else {
@@ -71,9 +71,10 @@ public class ImportProductCatalogAction implements IAction {
 				// redirect to the welcome page
 				return "welcome.jsp";
 			}
-		} else
+		} else {
 			// redirect to the login page
 			return "login.jsp";
+		}
 	}
 
 	@Override

@@ -1,17 +1,25 @@
 package de.htwg_konstanz.ebus.wholesaler.main;
 
-public class TooManyPricesForOneCountryException extends Exception{
-	 /**
-	 * 
+/**
+ * Needed in case of more than one price for one country.
+ */
+public class TooManyPricesForOneCountryException extends Exception {
+
+	/**
+	 * Default serialVersionUID.
 	 */
 	private static final long serialVersionUID = -8336552305248298816L;
 
-	//Parameterless Constructor
-    public TooManyPricesForOneCountryException() {}
+	/**
+	 * Parameterless Constructor.
+	 */
+    public TooManyPricesForOneCountryException() { }
 
-    //Constructor that accepts a message
-    public TooManyPricesForOneCountryException(String message)
-    {
+    /**
+     * Constructor that accepts a message.
+     * @param message Message
+     */
+    public TooManyPricesForOneCountryException(String message) {
        super(message);
     }
 }

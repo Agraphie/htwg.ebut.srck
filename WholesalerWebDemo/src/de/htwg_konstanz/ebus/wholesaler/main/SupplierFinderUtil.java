@@ -9,13 +9,22 @@ import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.SupplierBOA;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.UserBOA;
 import de.htwg_konstanz.ebus.wholesaler.demo.LoginBean;
 
-public class SupplierFinderUtil {
+/**
+ * Very important util which find suppliers.
+ * @author srck
+ *
+ */
+public final class SupplierFinderUtil {
+
+	/**
+	 * not called.
+	 */
+	private SupplierFinderUtil() { }
 
 	/**TODO SYNCHRONIZED
 	 * Compare on basis of the address, so we find the logged-in supplier.
-	 * Returns the logged-in supplier as {@link BOSupplier}. 
-	 * 
-	 * @param loginBean 
+	 * Returns the logged-in supplier as {@link BOSupplier}.
+	 * @param loginBean LoginBean logged-in user
 	 * @return endSupplier logged-in supplier
 	 */
 	public static BOSupplier supplierFinder(LoginBean loginBean) {

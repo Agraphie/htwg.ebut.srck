@@ -50,13 +50,18 @@ import de.htwg_konstanz.ebus.framework.wholesaler.vo.voa.ProductreferenceVOA;
 import de.htwg_konstanz.ebus.wholesaler.demo.LoginBean;
 import de.htwg_konstanz.ebus.wholesaler.demo.util.Constants;
 
+/**
+ * 
+ * @author srck
+ *
+ */
 public class Importer {
 	private static XPathFactory xpFactory;
 	private static final String ATTRIBUTE_PRICE_TYPE = "price_type";
 	private static final String ATTRIBUTE_TYPE = "type";
 	private static final BigDecimal INCREASE_IN_PRICE = new BigDecimal(2);
 
-	public void startImport(HttpServletRequest request, LoginBean loginBean)throws SAXParseException, SAXException,  IOException, XPathExpressionException, TooManyPricesForOneCountryException {
+	public void startImport(HttpServletRequest request, LoginBean loginBean)throws SAXException,  IOException, XPathExpressionException, TooManyPricesForOneCountryException {
 		// get the supplier id and supplier
 		BOSupplier endSupplier = SupplierFinderUtil.supplierFinder(loginBean);
 
@@ -70,27 +75,27 @@ public class Importer {
 			Schema bmeCatSchema = getSchema();
 
 			DocumentBuilder xmlBuilder = getXMLBuilder(bmeCatSchema);
-			
+
 			// iterate over uploaded files
 			parsedUploadedItem = parseUploadItem(parsedUploadedItem, items,	xmlBuilder);
 
-			try{
+			try {
 				bmeCatSchema.newValidator().validate(new DOMSource(parsedUploadedItem));
-			} catch (SAXParseException e){
+			} catch (SAXParseException e) {
 				throw new SAXException();
 			}
 			// return type is nodeSet with all Articles. Cool right? XPath value
 			// could be everything
 			// get XPath factory
 			xpFactory = XPathFactory.newInstance();
-			NodeList articles = (NodeList) xpFactory.newXPath().evaluate("/BMECAT/T_NEW_CATALOG/ARTICLE", parsedUploadedItem,XPathConstants.NODESET);
+			NodeList articles = (NodeList) xpFactory.newXPath().evaluate("/BMECAT/T_NEW_CATALOG/ARTICLE", parsedUploadedItem, XPathConstants.NODESET);
 
 			createAndPersistArticles(articles, endSupplier);
 
 		}
 	}
 
-	private Document parseUploadItem(Document parsedUploadedItem,List<FileItem> items, DocumentBuilder xmlBuilder)	throws IOException, SAXException {
+	private Document parseUploadItem(Document parsedUploadedItem, List<FileItem> items, DocumentBuilder xmlBuilder)	throws IOException, SAXException {
 		Iterator<FileItem> iter = items.iterator();
 
 		while (iter.hasNext()) {
@@ -150,15 +155,14 @@ public class Importer {
 		dbfactory.setXIncludeAware(false);
 		return dbfactory;
 	}
-	
-	/**
-	 * Create and persist articles
-	 * 
-	 * @param articles contains uploaded articles 
-	 * @param supplier logged-in supplier
-	 * @throws TooManyPricesForOneCountryException 
-	 */
 
+
+	 /**
+	 * Create and persist articles.
+	 * @param articles contains uploaded articles
+	 * @param supplier logged-in supplier
+	 * @throws TooManyPricesForOneCountryException in case of > 1 price for one country
+	 */
 	public void createAndPersistArticles(NodeList articles, BOSupplier supplier) throws TooManyPricesForOneCountryException {
 		// iterate over the nodeset and get _all_ the contens!
 		for (int i = 0; i < articles.getLength(); i++) {
@@ -208,25 +212,24 @@ public class Importer {
 
 		}
 	}
-	
-	/**
-	 * Create references to other products
-	 * 
-	 * @param currentNode in that case <ARTICLE_REFERENCE>
-	 * @param product
-	 */
 
-	private void createReferenceToOtherProducts(Element currentNode, BOProduct product){
-		
-		String referenceType = currentNode.getAttribute(ATTRIBUTE_TYPE);	
+	/**
+	 * Create references to other products.
+	 *
+	 * @param currentNode in that case <ARTICLE_REFERENCE>
+	 * @param product current product
+	 */
+	private void createReferenceToOtherProducts(Element currentNode, BOProduct product) {
+
+		String referenceType = currentNode.getAttribute(ATTRIBUTE_TYPE);
 		NodeList referencen = getChildNodes(currentNode);
 
 
 		ProductreferencePK referencePK = new ProductreferencePK();
 		Productreference reference = new Productreference();
 		Product pro = ProductVOA.getInstance().get(product.getMaterialNumber());
-		
-		for(int i = 0; i < referencen.getLength() ; i++){
+
+		for (int i = 0; i < referencen.getLength(); i++) {
 			String nodeName = referencen.item(i).getNodeName();
 			Element node = (Element) referencen.item(i);
 			if (textContentNotNull(node) && Constants.ARTICLE_ARTICLE_REFERENCE_ART_ID_TO.equals(nodeName)) {
@@ -238,21 +241,20 @@ public class Importer {
 				reference.setQuantity(1);
 				reference.setReferencetype(referenceType);
 				//reference.setRemark(remark);
-				
+
 				ProductreferenceVOA.getInstance().saveOrUpdate(reference);
 			}
-		}	
+		}
 	}
-	
+
 	/**
-	 * Create/persist the sales- and purchaseprice. 
-	 * 
+	 * Create/persist the sales- and purchaseprice.
+	 *
 	 * @param currentNode in that case <ARTICLE_PRICE_DETAILS>
 	 * @param product every price needs a product!
-	 * @throws TooManyPricesForOneCountryException 
+	 * @throws TooManyPricesForOneCountryException  in case of > 1 price for one country
 	 */
-
-	private void setArticlePriceDetails(Element currentNode, BOProduct product) throws TooManyPricesForOneCountryException{
+	private void setArticlePriceDetails(Element currentNode, BOProduct product) throws TooManyPricesForOneCountryException {
 		//List with all persisted prices for this article
 		//in case an article has several equal prices
 		HashSet<String> persistedPricesPerCountry = new HashSet<String>();
@@ -261,11 +263,11 @@ public class Importer {
 			// create a sales/purchase price
 			Element articlePriceNode = (Element) articlePrices.item(i);
 
-			String priceType = articlePriceNode.getAttribute(ATTRIBUTE_PRICE_TYPE);	
+			String priceType = articlePriceNode.getAttribute(ATTRIBUTE_PRICE_TYPE);
 			BigDecimal amount = null;
 			BigDecimal taxrate = null;
 			BOCountry country = null;
-			
+
 			NodeList priceElementChilds = articlePriceNode.getChildNodes();
 			for (int j = 0; j < priceElementChilds.getLength(); j++) {
 				Node node = priceElementChilds.item(j);
@@ -274,24 +276,24 @@ public class Importer {
 					String textContent = node.getTextContent();
 					if (Constants.ARTICLE_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_PRICE_AMOUNT.equals(nodeName)) {
 						amount = new BigDecimal(textContent);
-					} else if (Constants.ARTICLE_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_PRICE_CURRENCY.equals(nodeName)) {
-						// not necessary - load default currency of territory
+					/*} else if (Constants.ARTICLE_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_PRICE_CURRENCY.equals(nodeName)) {
+						 not necessary - load default currency of territory*/
 					} else if (Constants.ARTICLE_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_TAX.equals(nodeName)) {
 						taxrate = new BigDecimal(textContent);
 					} else if (Constants.ARTICLE_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_TERRITORY.equals(nodeName)) {
 						// load corresponding country
 						country = CountryBOA.getInstance().findCountry(textContent);
-					}	
-					if(articlePriceDetailsNotNull(amount, taxrate, country) && !persistedPricesPerCountry.contains(country.getIsocode())){
+					}
+					if (articlePriceDetailsNotNull(amount, taxrate, country) && !persistedPricesPerCountry.contains(country.getIsocode())) {
 						BOSalesPrice salesPrice = new BOSalesPrice(increaseSalesPrice(amount), taxrate, priceType);
 						salesPrice.setCountry(country);
 						salesPrice.setProduct(product);
 						salesPrice.setLowerboundScaledprice(new Integer(1));
-						
+
 						//TODO Bugfix
 						PriceBOA.getInstance().saveOrUpdateSalesPrice(salesPrice);
 						persistedPricesPerCountry.add(country.getIsocode());
-						
+
 						BOPurchasePrice purchasePrice = new BOPurchasePrice(amount, taxrate, priceType);
 						purchasePrice.setCountry(country);
 						purchasePrice.setProduct(product);						

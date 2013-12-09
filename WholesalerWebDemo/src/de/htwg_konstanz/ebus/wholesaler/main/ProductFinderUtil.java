@@ -8,16 +8,25 @@ import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOProduct;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOSupplier;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.ProductBOA;
 import de.htwg_konstanz.ebus.wholesaler.demo.LoginBean;
-
-public class ProductFinderUtil {
+/**
+ * Very important util which finds products for supplier
+ * @author srck
+ *
+ */
+public final class ProductFinderUtil {
 
 	/**
-	 *  find all available products for current Supplier
-	 * @param loginBean
-	 * @return productListTemp 
+	 * not called.
 	 */
-	public static List<BOProduct> findProductsForSupplier(LoginBean loginBean) {
-		
+	private ProductFinderUtil() { }
+
+	/**
+	 * find all available products for current Supplier.
+	 * @param loginBean LoginBean logged-in user
+	 * @return productListTemp List<BOProduct>
+	 */
+	public static List<BOProduct> findProductsForSupplier(final LoginBean loginBean) {
+
 		// Use temp list to save all the products which belong to the logged in supplier
 		List<BOProduct> productList = ProductBOA.getInstance().findAll();
 
@@ -34,5 +43,5 @@ public class ProductFinderUtil {
 		return productListTemp;
 	}
 
-	
+
 }

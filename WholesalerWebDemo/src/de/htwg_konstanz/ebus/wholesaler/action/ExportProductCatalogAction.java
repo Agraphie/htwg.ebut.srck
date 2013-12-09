@@ -12,12 +12,12 @@ import de.htwg_konstanz.ebus.wholesaler.demo.LoginBean;
 import de.htwg_konstanz.ebus.wholesaler.demo.util.Constants;
 import de.htwg_konstanz.ebus.wholesaler.main.Exporter;
 
-public class ExportProductCatalogAction implements IAction{
+public class ExportProductCatalogAction implements IAction {
 
 	private static final String PARAM_LOGIN_BEAN = "loginBean";
 	private static final String PARAM_PRODUCT_FILE = "productFile";
 
-	
+
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response, ArrayList<String> errorList) {
 			// get the login bean from the session
@@ -27,33 +27,33 @@ public class ExportProductCatalogAction implements IAction{
 			if (loginBean != null && loginBean.isLoggedIn()) {
 				// ensure that the user is allowed to execute this action (authorization) at this time the authorization is not fully implemented.
 				// -> use the "Security.RESOURCE_ALL" constant which includes all resources.
-				if (Security.getInstance().isUserAllowed(loginBean.getUser(),Security.RESOURCE_ALL, Security.ACTION_READ)) {
-					
+				if (Security.getInstance().isUserAllowed(loginBean.getUser(), Security.RESOURCE_ALL, Security.ACTION_READ)) {
+
 					String filter = (String) request.getParameter("filter");
 					String format = (String) request.getParameter("exportFormat");
 					boolean isFormatBMEcat = format.equals("formatBMEcat") ? true : false;
 					File file = null;
 					Exporter exporter = null;
-					
-					//Search by Shortdesciption 
-					if(!filter.equals("") && filter != null && !filter.equals(" ")){
+
+					//Search by Shortdesciption
+					if (!filter.equals("") && filter != null && !filter.equals(" ")) {
 						exporter = new Exporter(filter, request.getSession().getServletContext(), isFormatBMEcat);
 						System.out.println("gefiltert");
-					}else{
-						exporter = new Exporter(null,request.getSession().getServletContext(), isFormatBMEcat);
+					} else {
+						exporter = new Exporter(null, request.getSession().getServletContext(), isFormatBMEcat);
 					}
-					
+
 					//ExportFormat
-					if(isFormatBMEcat){
+					if (isFormatBMEcat) {
 						file = exporter.getBMEcat();
 
-					}else{
+					} else {
 						file = exporter.getXHTML();
 					}
-					
+
 					// now set the file to the session
-					request.getSession(true).setAttribute("file", file);		        
-					
+					request.getSession(true).setAttribute("file", file);
+
 					return "export.jsp";
 				} else {
 					// authorization failed -> show error message
@@ -62,9 +62,10 @@ public class ExportProductCatalogAction implements IAction{
 					// redirect to the welcome page
 					return "welcome.jsp";
 				}
-			} else
+			} else {
 				// redirect to the login page
 				return "login.jsp";
+			}
 	}
 
 	@Override
