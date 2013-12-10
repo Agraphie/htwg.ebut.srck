@@ -136,8 +136,8 @@ public class ControllerServlet extends HttpServlet
 					// ensure that all the performed changes in the previous action will be committed to the database
 				    _BaseBOA.getInstance().commit();
 					
-					response.sendRedirect(response.encodeRedirectURL(redirectURL));
-					
+				    response.sendRedirect(response.encodeRedirectURL(redirectURL));
+				    
 					return;
 				}
 			}

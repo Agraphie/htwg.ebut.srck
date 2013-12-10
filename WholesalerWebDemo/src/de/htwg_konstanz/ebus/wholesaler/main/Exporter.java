@@ -1,7 +1,9 @@
 package de.htwg_konstanz.ebus.wholesaler.main;
 
 import java.io.File;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -27,9 +29,12 @@ import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.PriceBOA;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.boa.ProductBOA;
 import de.htwg_konstanz.ebus.wholesaler.demo.util.Constants;
 
+/**
+ * @author Simon and Clemens.
+ *
+ */
 public class Exporter {
 
-	//TODO: Check for valid (generated) XMLFile -> necessary?
 
 	private static final String ATTRIBUTE_PRICE_TYPE = "price_type";
 	private Document doc;
@@ -37,15 +42,24 @@ public class Exporter {
 	private Collection<BOProduct> products;
 	private File repository;
 
+	/**
+	 * @param shortDescription The shortDescription to look for.
+	 * @param context The servlet context.
+	 * @param isFormatBMEcat Output format BMECat (XML) or XHTML.
+	 */
 	public Exporter(String shortDescription, ServletContext context, boolean isFormatBMEcat) {
 		init(shortDescription, context, isFormatBMEcat);
 	}
 
-
+	/**
+	 * @param shortDescription The shortDescription to look for.
+	 * @param context The servlet context.
+	 * @param isFormatBMEcat Output format BMECat (XML) or XHTML.
+	 */
 	private void init(String shortDescription, ServletContext context, boolean isFormatBMEcat) {
 
 		if (stringNotNull(shortDescription)) {
-			products = ProductBOA.getInstance().findByShortdescription(shortDescription);
+			products = ProductBOA.getInstance().findByCriteriaLike("Shortdescription", "%"+shortDescription+"%");
 		} else {
 			products = ProductBOA.getInstance().findAll();
 		}
@@ -90,10 +104,11 @@ public class Exporter {
 
 	public File getBMEcat() {
 		createDocument();
-		File file = new File(repository.getAbsolutePath() + "\\generatedBMEcat.xml");
+		//generate TS for unique filenames
+		File file = new File(repository.getAbsolutePath() + "\\generatedBMEcat_ts="+new GregorianCalendar().getTimeInMillis()+".xml");
 		StreamResult streamResult = new StreamResult(file);
 		try {
-			//FIXME: koennte racecondition verursachen. entweder methode satic + synchronized machen oder file anders oder wo anders speichern
+			//FIXME: koennte racecondition verursachen. entweder methode satic + synchronized machen oder file anders(name) oder wo anders speichern
 			bumblebee.transform(new DOMSource(doc), streamResult);
 		} catch (TransformerException e) {
 			// TODO Auto-generated catch block
@@ -105,7 +120,7 @@ public class Exporter {
 
 	public File getXHTML() {
 
-		File file = new File(repository.getAbsolutePath() + "\\genratedXHTML.html");
+		File file = new File(repository.getAbsolutePath() + "\\genratedXHTML_ts="+new GregorianCalendar().getTimeInMillis()+".html");
 		StreamResult streamResult = new StreamResult(file);
 		try {
 			bumblebee.transform(new DOMSource(doc), streamResult);
@@ -176,8 +191,6 @@ public class Exporter {
 	private Element createArticleDetails(BOProduct product) {
 		Element articleDetails = null;
 		if (stringNotNull(product.getLongDescription()) || stringNotNull(product.getShortDescription())) {
-			//FIXME ean nicht immer vorhanden? was hier speichern? ist mind eine nummer pflicht hier?
-			//Element ean = doc.createElement(Constants.ARTICLE_ARTICLE_DETAILS_EAN);
 			articleDetails = doc.createElement(Constants.ARTICLE_ARTICLE_DETAILS);
 
 			if (stringNotNull(product.getShortDescription())) {
@@ -212,7 +225,6 @@ public class Exporter {
 		Element articlePriceDetails = null;
  		if (!salesPrices.isEmpty()) {
 			articlePriceDetails = doc.createElement(Constants.ARTICLE_ARTICLE_PRICE_DETAILS);
-			//FIXME anstelle von mehrere preisinstanzen für genau den selben preis, mehrere TERRITORY
  			for (BOSalesPrice salesPrice :salesPrices) {
 				Element articlePrice = doc.createElement(Constants.ARTICLE_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE);
 				Element priceAmount = doc.createElement(Constants.ARTICLE_ARTICLE_PRICE_DETAILS_ARTICLE_PRICE_PRICE_AMOUNT);
@@ -268,9 +280,7 @@ public class Exporter {
 		catalogVersion.setTextContent("1.0");
 		catalogName.setTextContent("Aktuelle Produkte der CKSR Cooperation");
 
-		//supplierName.setTextContent(SupplierFinderUtil.supplierFinder(loginBean).getCompanyname());
-		//FIXME wer ist supplier für alle produkte?!
-		supplierName.setTextContent("DER Supplier");
+		supplierName.setTextContent("CKSR Coop.");
 
 
 		return header;

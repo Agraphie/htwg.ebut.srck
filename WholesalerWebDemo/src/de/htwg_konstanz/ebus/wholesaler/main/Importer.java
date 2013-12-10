@@ -290,7 +290,6 @@ public class Importer {
 						salesPrice.setProduct(product);
 						salesPrice.setLowerboundScaledprice(new Integer(1));
 
-						//TODO Bugfix
 						PriceBOA.getInstance().saveOrUpdateSalesPrice(salesPrice);
 						persistedPricesPerCountry.add(country.getIsocode());
 

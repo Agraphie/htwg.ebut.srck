@@ -21,7 +21,7 @@ public final class SupplierFinderUtil {
 	 */
 	private SupplierFinderUtil() { }
 
-	/**TODO SYNCHRONIZED
+	/**
 	 * Compare on basis of the address, so we find the logged-in supplier.
 	 * Returns the logged-in supplier as {@link BOSupplier}.
 	 * @param loginBean LoginBean logged-in user
