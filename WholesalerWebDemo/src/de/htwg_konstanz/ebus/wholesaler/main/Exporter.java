@@ -11,6 +11,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
+import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -21,6 +22,8 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import com.sun.org.apache.xalan.internal.xsltc.compiler.Template;
 
 import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOProduct;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOSalesPrice;
@@ -76,10 +79,11 @@ public class Exporter {
 	        if (isFormatBMEcat) {
 		        bumblebee = autobots.newTransformer();
 		        //TODO: PrettyPrintXML
-		        bumblebee.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+		        bumblebee.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1");
 		        bumblebee.setOutputProperty(OutputKeys.INDENT, "yes");
 	        } else {
-	    		StreamSource xslt = new StreamSource("C:\\temp\\tranformationBMEcatToXHTML.xslt");
+	        	File stylesheet = new File("C:\\temp\\tranformationBMEcatToXHTML.xslt");
+	    		StreamSource xslt = new StreamSource(stylesheet);
 	        	bumblebee = autobots.newTransformer(xslt);
 	        }
 
@@ -108,12 +112,13 @@ public class Exporter {
 		createDocument();
 		//generate TS for unique filenames
 		long ts = new GregorianCalendar().getTimeInMillis();
-		String filename = "\\generatedBMEcat_ts=";
+		String filename = "\\generatedBMEcat_ts="+ts;
 		
 		String fullyQualifiedPathName = repository.getAbsolutePath() + filename + FILETYPE_XML;
 		File file = new File(fullyQualifiedPathName);
 		StreamResult streamResult = new StreamResult(file);
 		try {
+			System.out.println(doc.getLocalName());
 			bumblebee.transform(new DOMSource(doc), streamResult);
 		} catch (TransformerException e) {
 			e.printStackTrace();
@@ -125,9 +130,9 @@ public class Exporter {
 	public File getXHTML() {
 		
 		long ts = new GregorianCalendar().getTimeInMillis();
-		String filename = "\\generatedXHTML_ts=";
+		String filename = "\\generatedXHTML_ts="+ts;
 		String fullyQualifiedPathName = repository.getAbsolutePath() + filename + FILETYPE_XHTML;
-
+		
 		File file = new File(fullyQualifiedPathName);
 		StreamResult streamResult = new StreamResult(file);
 		try {
@@ -292,5 +297,7 @@ public class Exporter {
 
 		return header;
 	}
+	
+		
 
 }

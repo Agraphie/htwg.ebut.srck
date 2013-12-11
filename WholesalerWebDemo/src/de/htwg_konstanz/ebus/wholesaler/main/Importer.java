@@ -78,7 +78,6 @@ public class Importer {
 
 			// iterate over uploaded files
 			parsedUploadedItem = parseUploadItem(parsedUploadedItem, items,	xmlBuilder);
-
 			try {
 				bmeCatSchema.newValidator().validate(new DOMSource(parsedUploadedItem));
 			} catch (SAXParseException e) {
@@ -95,22 +94,21 @@ public class Importer {
 		}
 	}
 
-	private Document parseUploadItem(Document parsedUploadedItem, List<FileItem> items, DocumentBuilder xmlBuilder)	throws IOException, SAXException {
-		Iterator<FileItem> iter = items.iterator();
+    private Document parseUploadItem(Document parsedUploadedItem,List<FileItem> items, DocumentBuilder xmlBuilder)        throws IOException, SAXException {
+        Iterator<FileItem> iter = items.iterator();
+        while (iter.hasNext()) {
+                FileItem item = iter.next();
+                // get input stream of the current item
+                InputStream uploadedItemIS = item.getInputStream();
+                // parse the input stream and output a w3c document
+                parsedUploadedItem = xmlBuilder.parse(uploadedItemIS);
 
-		while (iter.hasNext()) {
-			FileItem item = iter.next();
-			// get input stream of the current item
-			InputStream uploadedItemIS = item.getInputStream();
-
-			// parse the input stream and output a w3c document
-			parsedUploadedItem = xmlBuilder.parse(uploadedItemIS);
-			xmlBuilder.reset();
-			// close input stream
-			uploadedItemIS.close();
-		}
-		return parsedUploadedItem;
-	}
+                xmlBuilder.reset();
+                // close input stream
+                uploadedItemIS.close();
+        }
+        return parsedUploadedItem;
+}
 
 	private DocumentBuilder getXMLBuilder(Schema bmeCatSchema) throws SAXParseException {
 		DocumentBuilder xmlBuilder = null;
@@ -133,7 +131,7 @@ public class Importer {
 		// get and set schema
 		SchemaFactory sFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
-		Schema bmeCatSchema = sFactory.newSchema(new File("C:\\Users\\Simon\\eclipse_workspaces\\workspace_WS13\\htwg.ebut.srck\\WholesalerWebDemo\\files\\bmecat_new_catalog_1_2_simple_V0.96.xsd"));
+		Schema bmeCatSchema = sFactory.newSchema(new File("C:\\temp\\bmecat_new_catalog_1_2_simple_V0.96.xsd"));
 		return bmeCatSchema;
 
 	}
