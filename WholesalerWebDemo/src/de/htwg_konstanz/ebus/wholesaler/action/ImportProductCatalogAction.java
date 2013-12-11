@@ -55,7 +55,6 @@ public class ImportProductCatalogAction implements IAction {
 					System.out.println("Could not parse to w3c document.");
 					e.printStackTrace();
 				} catch (XPathExpressionException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 

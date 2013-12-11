@@ -28,9 +28,7 @@
 			<p><input type="radio" value="formatBMEcat" name="exportFormat" checked="checked">BMEcat</p>
 			<p><input type="radio" value="formatXhtml" name="exportFormat">XHTML</p>
 			<p><input type="submit" name="Submit" value="export"></p>
-		
-		<!-- <input type="submit" value="Press" id="submit"> to export all 
-		products -->
+
 	</form>
 	<% File file = (File) session.getAttribute("file"); 
 		if(file != null){

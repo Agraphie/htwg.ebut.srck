@@ -1,7 +1,6 @@
 package de.htwg_konstanz.ebus.wholesaler.main;
 
 import java.io.File;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -37,6 +36,10 @@ public class Exporter {
 
 
 	private static final String ATTRIBUTE_PRICE_TYPE = "price_type";
+	private static final String FILETYPE_XML = ".xml";
+	private static final String FILETYPE_XHTML = ".xhtml";
+	
+	
 	private Document doc;
 	private Transformer bumblebee;
 	private Collection<BOProduct> products;
@@ -72,11 +75,11 @@ public class Exporter {
 	        TransformerFactory autobots = TransformerFactory.newInstance();
 	        if (isFormatBMEcat) {
 		        bumblebee = autobots.newTransformer();
-		        //PrettyPrintXML
+		        //TODO: PrettyPrintXML
 		        bumblebee.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 		        bumblebee.setOutputProperty(OutputKeys.INDENT, "yes");
 	        } else {
-	    		Source xslt = new StreamSource("C:\\temp\\xmlToHtml.xslt");
+	    		StreamSource xslt = new StreamSource("C:\\temp\\tranformationBMEcatToXHTML.xslt");
 	        	bumblebee = autobots.newTransformer(xslt);
 	        }
 
@@ -85,7 +88,6 @@ public class Exporter {
 		} catch (ParserConfigurationException pce) {
 			pce.printStackTrace();
 		} catch (TransformerConfigurationException tce) {
-			// TODO Auto-generated catch block
 			tce.printStackTrace();
 		}
 
@@ -105,13 +107,15 @@ public class Exporter {
 	public File getBMEcat() {
 		createDocument();
 		//generate TS for unique filenames
-		File file = new File(repository.getAbsolutePath() + "\\generatedBMEcat_ts="+new GregorianCalendar().getTimeInMillis()+".xml");
+		long ts = new GregorianCalendar().getTimeInMillis();
+		String filename = "\\generatedBMEcat_ts=";
+		
+		String fullyQualifiedPathName = repository.getAbsolutePath() + filename + FILETYPE_XML;
+		File file = new File(fullyQualifiedPathName);
 		StreamResult streamResult = new StreamResult(file);
 		try {
-			//FIXME: koennte racecondition verursachen. entweder methode satic + synchronized machen oder file anders(name) oder wo anders speichern
 			bumblebee.transform(new DOMSource(doc), streamResult);
 		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return file;
@@ -119,8 +123,12 @@ public class Exporter {
 
 
 	public File getXHTML() {
+		
+		long ts = new GregorianCalendar().getTimeInMillis();
+		String filename = "\\generatedXHTML_ts=";
+		String fullyQualifiedPathName = repository.getAbsolutePath() + filename + FILETYPE_XHTML;
 
-		File file = new File(repository.getAbsolutePath() + "\\genratedXHTML_ts="+new GregorianCalendar().getTimeInMillis()+".html");
+		File file = new File(fullyQualifiedPathName);
 		StreamResult streamResult = new StreamResult(file);
 		try {
 			bumblebee.transform(new DOMSource(doc), streamResult);
@@ -136,7 +144,6 @@ public class Exporter {
 	private Element createRootElement() {
 		Element root = doc.createElement("BMECAT");
 		root.setAttribute("version", "1.2");
-		//FIXME Bin mir nicht sicher ob man die Attribute braucht
 		root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
 		root.setAttribute("xsi:noNamespaceSchemaLocation", "bmecat_new_catalog_1_2_simple_V0.96.xsd");
 		return root;
@@ -237,11 +244,11 @@ public class Exporter {
 				articlePrice.appendChild(priceTax);
 				articlePrice.appendChild(priceTerritory);
 
-				// FIXME Brutto oder Nettopreis ausgeben?
 				priceAmount.setTextContent(salesPrice.getAmount().toString());
 				priceCurrency.setTextContent(salesPrice.getCountry().getCurrency().getCode());
 				priceTax.setTextContent(salesPrice.getTaxrate().toString());
 				priceTerritory.setTextContent(salesPrice.getCountry().getIsocode());
+				//FIXME: Was passiert wenn ein kein PReistype gibt?
 				articlePrice.setAttribute(ATTRIBUTE_PRICE_TYPE, salesPrice.getPricetype());
 
 				articlePriceDetails.appendChild(articlePrice);

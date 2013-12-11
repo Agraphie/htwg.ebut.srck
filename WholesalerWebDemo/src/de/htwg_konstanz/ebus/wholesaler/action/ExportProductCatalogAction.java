@@ -15,8 +15,6 @@ import de.htwg_konstanz.ebus.wholesaler.main.Exporter;
 public class ExportProductCatalogAction implements IAction {
 
 	private static final String PARAM_LOGIN_BEAN = "loginBean";
-	private static final String PARAM_PRODUCT_FILE = "productFile";
-
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response, ArrayList<String> errorList) {
@@ -29,6 +27,7 @@ public class ExportProductCatalogAction implements IAction {
 				// -> use the "Security.RESOURCE_ALL" constant which includes all resources.
 				if (Security.getInstance().isUserAllowed(loginBean.getUser(), Security.RESOURCE_ALL, Security.ACTION_READ)) {
 
+					//searchcriteria
 					String filter = (String) request.getParameter("filter");
 					String format = (String) request.getParameter("exportFormat");
 					boolean isFormatBMEcat = format.equals("formatBMEcat") ? true : false;
@@ -46,7 +45,6 @@ public class ExportProductCatalogAction implements IAction {
 					//ExportFormat
 					if (isFormatBMEcat) {
 						file = exporter.getBMEcat();
-
 					} else {
 						file = exporter.getXHTML();
 					}

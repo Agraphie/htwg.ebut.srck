@@ -38,28 +38,30 @@
 	<%@ include file="navigation.jspfragment"%>
 
 	<h1>Import Product Catalog</h1>
-	<form method="POST"	enctype="multipart/form-data"  action="<%= response.encodeURL("controllerservlet") %> ">
-		<input type="hidden" name="action" value=Constants.ACTION_IMPORT_SUPPLIER_PRODUCTS>
-		File to upload: <input type="file" name="upfile" id="upfile" onChange="buttonEnable(this)"><br /> <input type="submit" value="Press" id="submit" disabled> to upload the file!
+
+	<form method="POST"	enctype="multipart/form-data" action="<%= response.encodeURL("controllerservlet?action=importSupplierProducts") %> ">
+		<input type="hidden" name="action" value="importSupplierProducts">
+		File to upload: <input type="file" name="upfile" id="upfile" onChange="buttonEnable(this)"><br /> 
+		<input type="submit" value="Press" id="submit" disabled> to upload the file!
 	</form>
 
-<table class="dataTable">
-<thead>
-<tr>
-<th><b>Title</b></th>
-<th><b>Description</b></th>
-</tr>
-</thead>
-<tbody>
-<c:forEach var="product" items="${sessionScope.productList}">
-<jsp:useBean id="product" type="de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOProduct" />
-<tr valign="top">
-<td><%= product.getShortDescriptionCustomer() %></td> 
-<td width="400px"><%= product.getLongDescriptionCustomer()%></td> 
-</tr>
-</c:forEach>
-</tbody>
-</table>
+	<table class="dataTable">
+		<thead>
+			<tr>
+				<th><b>Title</b></th>
+				<th><b>Description</b></th>
+			</tr>
+		</thead>
+		<tbody>
+			<c:forEach var="product" items="${sessionScope.productList}">
+				<jsp:useBean id="product" type="de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOProduct" />
+				<tr valign="top">
+					<td><%= product.getShortDescriptionCustomer() %></td>
+					<td width="400px"><%= product.getLongDescriptionCustomer() %></td>
+				</tr>
+			</c:forEach>
+		</tbody>
+	</table>
 
 </body>
 </html>
