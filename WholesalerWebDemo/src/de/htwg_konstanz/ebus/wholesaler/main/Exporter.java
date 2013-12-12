@@ -10,8 +10,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Source;
-import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -22,8 +20,6 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import com.sun.org.apache.xalan.internal.xsltc.compiler.Template;
 
 import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOProduct;
 import de.htwg_konstanz.ebus.framework.wholesaler.api.bo.BOSalesPrice;
@@ -96,6 +92,9 @@ public class Exporter {
 
 	}
 
+	/**
+	 * Method to instantiate the building process of a new document.
+	 */
 	private void createDocument() {
 		Element root = createRootElement();
 		Element header = createHeader();
@@ -107,6 +106,10 @@ public class Exporter {
 	}
 
 
+	/**
+	 * Method is called when a standard BMECat should be exported.
+	 * @return A file with the generated XML-Document.
+	 */
 	public File getBMEcat() {
 		createDocument();
 		//generate TS for unique filenames
@@ -126,6 +129,11 @@ public class Exporter {
 	}
 
 
+
+	/**
+	 * Method is called when a XHTML document should be exported.
+	 * @return A the generated XHTML-Document as File.
+	 */
 	public File getXHTML() {
 		createDocument();
 
@@ -140,7 +148,6 @@ public class Exporter {
 			//new StreamSource(new File("C:\\temp\\articles_bmecat_new_catalog_1_2_simple_V0.96.xml")
 			bumblebee.transform(new DOMSource(doc), streamResult);
 		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return file;
@@ -148,6 +155,10 @@ public class Exporter {
 
 
 
+	/**
+	 * Method to create the header and root of the demanded document.
+	 * @return The root element of the catalog.
+	 */
 	private Element createRootElement() {
 		Element root = doc.createElement("BMECAT");
 		root.setAttribute("version", "1.2");
@@ -156,6 +167,10 @@ public class Exporter {
 		return root;
 	}
 
+	/**
+	 * Method to generate the new catalog.
+	 * @return A new catalog element in in BMECat format.
+	 */
 	private Element createTNewCatalog() {
 		Element tNewCatalog = doc.createElement("T_NEW_CATALOG");
 		for (BOProduct product : products) {
@@ -202,6 +217,11 @@ public class Exporter {
 		return tNewCatalog;
 	}
 
+	/**
+	 * Method to create the article details for each demanded article.
+	 * @param product Product for which the details are generated.
+	 * @return The article details element.
+	 */
 	private Element createArticleDetails(BOProduct product) {
 		Element articleDetails = null;
 		if (stringNotNull(product.getLongDescription()) || stringNotNull(product.getShortDescription())) {
@@ -223,6 +243,10 @@ public class Exporter {
 		return articleDetails;
 	}
 
+	/**
+	 * Method to generate the article order details for each article.
+	 * @return The order details for the demanded article.
+	 */
 	private Element createArticleOrderDetails() {
 		Element articleOrderDetails = doc.createElement(Constants.ARTICLE_ARTICLE_ORDER_DETAILS);
 		Element orderUnit = doc.createElement(Constants.ARTICLE_ARTICLE_ORDER_DETAILS_ORDER_UNIT);
@@ -234,6 +258,11 @@ public class Exporter {
 		return articleOrderDetails;
 	}
 
+	/**
+	 * Method to generate the price details for the demanded product.
+	 * @param product Product to generate price details for.
+	 * @return The demanded product with price details.
+	 */
 	private Element createArticlePriceDetails(BOProduct product) {
 		List <BOSalesPrice> salesPrices = PriceBOA.getInstance().findSalesPrices(product);
 		Element articlePriceDetails = null;
@@ -265,10 +294,19 @@ public class Exporter {
 
 	}
 
+	/**
+	 * Method to test whether a String is empty or null
+	 * @param string String to test.
+	 * @return True or false.
+	 */
 	private boolean stringNotNull(String string) {
 		return string != null && !string.isEmpty() && !string.equals(" ");
 	}
 
+	/**
+	 * Method to create the header of the BMECat document.
+	 * @return A head for a BMECat document.
+	 */
 	private Element createHeader() {
 		Element header = doc.createElement("HEADER");
 		Element catalog = doc.createElement("CATALOG");

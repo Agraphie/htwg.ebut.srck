@@ -20,12 +20,23 @@ import de.htwg_konstanz.ebus.wholesaler.main.Importer;
 import de.htwg_konstanz.ebus.wholesaler.main.ProductFinderUtil;
 import de.htwg_konstanz.ebus.wholesaler.main.TooManyPricesForOneCountryException;
 
+/**
+ * 
+ * @author Simon, Clemens
+ *
+ */
 public class ImportProductCatalogAction implements IAction {
 
 	private static final String PARAM_LOGIN_BEAN = "loginBean";
 	private static final String PARAM_PRODUCT_LIST = "productList";
 
-	@Override
+
+	/**
+	 * Servlet to handle the imports of catalogs. Is called by the controllservlet class.
+	 * @param request The despatched request.
+	 * @param response The despatched response.
+	 * @param errorList The despatched errorlist.
+	 */
 	public String execute(HttpServletRequest request, HttpServletResponse response, ArrayList<String> errorList) {
 		// get the login bean from the session
 		LoginBean loginBean = (LoginBean) request.getSession(true).getAttribute(PARAM_LOGIN_BEAN);
@@ -38,6 +49,7 @@ public class ImportProductCatalogAction implements IAction {
 
 				try {
 					new Importer().startImport(request, loginBean);
+					errorList.add("Import successful!");
 				} catch (SAXParseException e) {
 					errorList.add("XML file is not well-formed!");
 					e.printStackTrace();
@@ -57,7 +69,6 @@ public class ImportProductCatalogAction implements IAction {
 				} catch (XPathExpressionException e) {
 					e.printStackTrace();
 				}
-
 				List<BOProduct> productList = ProductFinderUtil.findProductsForSupplier(loginBean);
 				// now set the right list to the session
 				request.getSession(true).setAttribute(PARAM_PRODUCT_LIST, productList);
@@ -76,7 +87,9 @@ public class ImportProductCatalogAction implements IAction {
 		}
 	}
 
-	@Override
+	/**
+	 * @param actionName The constant this class accepts.
+	 */
 	public boolean accepts(String actionName) {
 		return actionName.equalsIgnoreCase(Constants.ACTION_IMPORT_SUPPLIER_PRODUCTS);
 	}

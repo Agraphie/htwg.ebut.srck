@@ -12,11 +12,21 @@ import de.htwg_konstanz.ebus.wholesaler.demo.LoginBean;
 import de.htwg_konstanz.ebus.wholesaler.demo.util.Constants;
 import de.htwg_konstanz.ebus.wholesaler.main.Exporter;
 
+/**
+ * Action to handle the export of items.
+ * @author Simon and Clemens
+ *
+ */
 public class ExportProductCatalogAction implements IAction {
 
 	private static final String PARAM_LOGIN_BEAN = "loginBean";
 
-	@Override
+	/**
+	 * Method to instantiate the export of items. Is called by the controllservlet class.
+	 * @param request The despatched request.
+	 * @param response The despatched response.
+	 * @param errorList The despatched errorlist.
+	 */
 	public String execute(HttpServletRequest request, HttpServletResponse response, ArrayList<String> errorList) {
 			// get the login bean from the session
 			LoginBean loginBean = (LoginBean) request.getSession(true).getAttribute(PARAM_LOGIN_BEAN);
@@ -66,7 +76,9 @@ public class ExportProductCatalogAction implements IAction {
 			}
 	}
 
-	@Override
+	/**
+	 * @param actionName The constant this class accepts.
+	 */
 	public boolean accepts(String actionName) {
 		return actionName.equalsIgnoreCase(Constants.ACTION_EXPORT_CUSTOMER_PRODUCTS);
 	}
