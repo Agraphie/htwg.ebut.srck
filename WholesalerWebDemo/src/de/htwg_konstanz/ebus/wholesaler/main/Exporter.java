@@ -78,8 +78,7 @@ public class Exporter {
 	        TransformerFactory autobots = TransformerFactory.newInstance();
 	        if (isFormatBMEcat) {
 		        bumblebee = autobots.newTransformer();
-		        //TODO: PrettyPrintXML
-		        bumblebee.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1");
+		        bumblebee.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 		        bumblebee.setOutputProperty(OutputKeys.INDENT, "yes");
 	        } else {
 	        	File stylesheet = new File("C:\\temp\\tranformationBMEcatToXHTML.xsl");
