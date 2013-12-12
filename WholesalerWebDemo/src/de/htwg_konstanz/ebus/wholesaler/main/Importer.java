@@ -99,7 +99,7 @@ public class Importer {
 			NodeList articles = (NodeList) xpFactory.newXPath().evaluate("/BMECAT/T_NEW_CATALOG/ARTICLE", parsedUploadedItem, XPathConstants.NODESET);
 
 			createAndPersistArticles(articles, endSupplier);
-
+			
 		}
 	}
 

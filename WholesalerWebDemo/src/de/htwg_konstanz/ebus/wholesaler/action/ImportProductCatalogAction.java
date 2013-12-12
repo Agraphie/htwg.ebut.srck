@@ -49,6 +49,7 @@ public class ImportProductCatalogAction implements IAction {
 
 				try {
 					new Importer().startImport(request, loginBean);
+					errorList.add("Import successful!");
 				} catch (SAXParseException e) {
 					errorList.add("XML file is not well-formed!");
 					e.printStackTrace();
@@ -68,7 +69,6 @@ public class ImportProductCatalogAction implements IAction {
 				} catch (XPathExpressionException e) {
 					e.printStackTrace();
 				}
-
 				List<BOProduct> productList = ProductFinderUtil.findProductsForSupplier(loginBean);
 				// now set the right list to the session
 				request.getSession(true).setAttribute(PARAM_PRODUCT_LIST, productList);
