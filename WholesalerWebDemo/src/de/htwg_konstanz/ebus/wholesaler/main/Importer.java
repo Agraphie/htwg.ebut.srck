@@ -51,7 +51,7 @@ import de.htwg_konstanz.ebus.wholesaler.demo.LoginBean;
 import de.htwg_konstanz.ebus.wholesaler.demo.util.Constants;
 
 /**
- * 
+ * Class to handle the uploaded file and import it.
  * @author srck
  *
  */
@@ -61,6 +61,15 @@ public class Importer {
 	private static final String ATTRIBUTE_TYPE = "type";
 	private static final BigDecimal INCREASE_IN_PRICE = new BigDecimal(2);
 
+	/**
+	 * Method to start the import.
+	 * @param request The despatched request.
+	 * @param loginBean The despatched current loginbean.
+	 * @throws SAXException Thrown if uploaded document not well formed.
+	 * @throws IOException Thrown if document can't be saved.
+	 * @throws XPathExpressionException Thrown if xpath expression invalid.
+	 * @throws TooManyPricesForOneCountryException Thrown if a product has more than one price for a country.
+	 */
 	public void startImport(HttpServletRequest request, LoginBean loginBean)throws SAXException,  IOException, XPathExpressionException, TooManyPricesForOneCountryException {
 		// get the supplier id and supplier
 		BOSupplier endSupplier = SupplierFinderUtil.supplierFinder(loginBean);
@@ -94,6 +103,15 @@ public class Importer {
 		}
 	}
 
+	/**
+	 * Method to parse the uploaded item in general.
+	 * @param parsedUploadedItem The created document, still null.
+	 * @param items The uploaded items.
+	 * @param xmlBuilder The xmlBuilder instance.
+	 * @return The builded xml file.
+	 * @throws IOException Thrown if file can't be saved.
+	 * @throws SAXException Thrown if file not well formed.
+	 */
     private Document parseUploadItem(Document parsedUploadedItem,List<FileItem> items, DocumentBuilder xmlBuilder)        throws IOException, SAXException {
         Iterator<FileItem> iter = items.iterator();
         while (iter.hasNext()) {
@@ -110,6 +128,12 @@ public class Importer {
         return parsedUploadedItem;
 }
 
+    /**
+     * Method to build a document builder.
+     * @param bmeCatSchema The XML schema.
+     * @return A document builder instance.
+     * @throws SAXParseException Thrown if file can't be parsed.
+     */
 	private DocumentBuilder getXMLBuilder(Schema bmeCatSchema) throws SAXParseException {
 		DocumentBuilder xmlBuilder = null;
 		DocumentBuilderFactory dbfactory = documentBuilderFactory(bmeCatSchema);
@@ -126,7 +150,12 @@ public class Importer {
 		xmlBuilder.setEntityResolver(null);
 		return xmlBuilder;
 	}
-
+	
+	/**
+	 * Method to build the schema based on a xsd file.
+	 * @return The demanded schema instance.
+	 * @throws SAXException Thrown if schema can't be build.
+	 */
 	private Schema getSchema() throws SAXException {
 		// get and set schema
 		SchemaFactory sFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -136,6 +165,12 @@ public class Importer {
 
 	}
 
+	/**
+	 * Method to instantiate a document builder factory. Properties like the schema and the temp location for the uploaded
+	 * file are set.
+	 * @param bmeCatSchema
+	 * @return An instance of a document builder factory.
+	 */
 	public DocumentBuilderFactory documentBuilderFactory(Schema bmeCatSchema) {
 		DocumentBuilderFactory dbfactory = DocumentBuilderFactory.newInstance();
 
@@ -305,6 +340,13 @@ public class Importer {
 
 	}
 
+	/**
+	 * Method to test if price details are null.
+	 * @param amount The amount of the price.
+	 * @param taxrate The taxrate of the price.
+	 * @param country The country the price is valid for.
+	 * @return True or false.
+	 */
 	private boolean articlePriceDetailsNotNull(BigDecimal amount,BigDecimal taxrate, BOCountry country) {
 		return amount != null && taxrate != null && country != null;
 	}
@@ -318,10 +360,11 @@ public class Importer {
 		return amount.multiply(INCREASE_IN_PRICE);
 	}
 
+
 	/**
-	 * Das Element <ARTICLE_PRICE_DETAILS> hat kinder und kindeskinder. um noch
-	 * eine doppelte for-schleife zu vermeiden mittels xpFactory geholt! y0?
-	 * 
+	 * Method to get the prices for an article.
+	 * @param currentNode The article prices are needed for.
+	 * @return Null or a nodelist with all prices.
 	 */
 	private NodeList fetchArticlePrices(Element currentNode) {
 		try {
@@ -335,11 +378,9 @@ public class Importer {
 	}
 
 	/**
-	 * Set ArticleOrderDetails on product?!
-	 * 
+	 * Set ArticleOrderDetails on product
 	 * @param currentNode in that case <ARTICLE_ORDER_DETAILS>
-	 * @param currentProduct 
-	 * 
+	 * @param product The product to set order details for.
 	 */
 	private BOProduct setArticleOrderDetails(Node currentNode, BOProduct product) {
 		NodeList childNodes = getChildNodes(currentNode);
@@ -405,14 +446,16 @@ public class Importer {
 	}
 
 	/**
-	 * Get childnodes of transfer parameter
+	 * Get child nodes of transfer parameter.
+	 * @param The node to for which the children are needed.
 	 */
 	private NodeList getChildNodes(Node currentNode) {
 		return currentNode.getChildNodes();
 	}
 
 	/**
-	 * Check for null value
+	 * Check for null value.
+	 * @param Node The node to check.
 	 */
 	private boolean textContentNotNull(Node node) {
 		return node.getTextContent() != null;
@@ -421,9 +464,8 @@ public class Importer {
 	
 	/**
 	 * Fileupload
-	 * 
-	 * @param request
-	 * @return
+	 * @param request The servlet request.
+	 * @return a list with the parsed items.
 	 */
 
 	private List<FileItem> fileUploadParser(HttpServletRequest request) {

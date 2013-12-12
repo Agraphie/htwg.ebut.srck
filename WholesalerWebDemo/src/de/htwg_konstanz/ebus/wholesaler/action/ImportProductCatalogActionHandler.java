@@ -12,14 +12,24 @@ import de.htwg_konstanz.ebus.wholesaler.demo.IAction;
 import de.htwg_konstanz.ebus.wholesaler.demo.LoginBean;
 import de.htwg_konstanz.ebus.wholesaler.demo.util.Constants;
 import de.htwg_konstanz.ebus.wholesaler.main.ProductFinderUtil;
-
+/**
+ * Class to handle the import of catalogs.
+ * @author Simon and Clemens
+ *
+ */
 public class ImportProductCatalogActionHandler implements IAction {
 
 	public static final String PARAM_LOGIN_BEAN = "loginBean";
 	private static final String PARAM_PRODUCT_LIST = "productList";
 
 
-	@Override
+	/**
+	 * Method to handle the import site.
+	 * @param request The despatched request.
+	 * @param response The despatched response.
+	 * @param errorList The despatched errorlist.
+	 * @return The string of the action to redirect to.
+	 */
 	public String execute(HttpServletRequest request, HttpServletResponse response, ArrayList<String> errorList) {
 		// get the login bean from the session
 		LoginBean loginBean = (LoginBean) request.getSession(true).getAttribute(PARAM_LOGIN_BEAN);
@@ -48,7 +58,9 @@ public class ImportProductCatalogActionHandler implements IAction {
 		}
 	}
 
-	@Override
+	/**
+	 * @param actionName The constant this class accepts.
+	 */
 	public boolean accepts(String actionName) {
 		return actionName.equalsIgnoreCase(Constants.ACTION_HANDLER_IMPORT_SUPPLIER_PRODUCTS);
 	}
