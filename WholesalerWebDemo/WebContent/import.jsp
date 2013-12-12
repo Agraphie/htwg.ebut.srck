@@ -13,16 +13,17 @@
 	function buttonEnable(ev) {
 		document.getElementById("submit").disabled = true;
 		if (ev.value) {
-			var fehlerMeldung = document.getElementById("fehlerMeldung");
-			if (fehlerMeldung != null) {
-				document.getElementById("fehlerMeldung").remove();
-			}
+			var wrongFileType = document.getElementById('wrongFileType');
+			if (wrongFileType != null) {
+				wrongFileType.innerHTML = "";			}
 			var fileName = ev.value;
 			var res = fileName.substr(fileName.lastIndexOf('.')) == '.xml';
 			if (res) {
 				document.getElementById("submit").disabled = false;
 			} else {
-				document.body.innerHTML += '<div id="fehlerMeldung"> Datei ist keine XML Datei!</div>';
+				wrongFileType.innerHTML = wrongFileType.innerHTML + '<b><font color="Red">Wrong file type! Only xml files can be imported</font></b>';
+				var errorJsp = document.getElementById('errorJsp');
+				errorJsp.innerHTML = "";
 			}
 		}
 	}
