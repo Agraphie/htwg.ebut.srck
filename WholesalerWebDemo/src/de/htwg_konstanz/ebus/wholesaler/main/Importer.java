@@ -206,7 +206,6 @@ public class Importer {
 				// query the current article and get it's S_AID
 				supplierAID = (String) xpFactory.newXPath().evaluate("SUPPLIER_AID", currentArticle,	XPathConstants.STRING);
 			} catch (XPathExpressionException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -371,7 +370,6 @@ public class Importer {
 			NodeList articlePrices = (NodeList) xpFactory.newXPath().evaluate("ARTICLE_PRICE", currentNode, XPathConstants.NODESET);
 			return articlePrices;
 		} catch (XPathExpressionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -388,7 +386,7 @@ public class Importer {
 			Node childNode = childNodes.item(i);
 			String nodeName = childNode.getNodeName();
 			if (textContentNotNull(childNode)) {
-				String textContent = childNode.getTextContent();
+				//String textContent = childNode.getTextContent();
 				if (Constants.ARTICLE_ARTICLE_ORDER_DETAILS_NO_CU_PER_OUT.equals(nodeName)) {
 					// not necessary
 				} else if (Constants.ARTICLE_ARTICLE_ORDER_DETAILS_ORDER_UNIT.equals(nodeName)) {
