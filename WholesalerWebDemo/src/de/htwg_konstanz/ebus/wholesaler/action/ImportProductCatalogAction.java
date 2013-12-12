@@ -46,10 +46,11 @@ public class ImportProductCatalogAction implements IAction {
 			// ensure that the user is allowed to execute this action (authorization) at this time the authorization is not fully implemented.
 			// -> use the "Security.RESOURCE_ALL" constant which includes all resources.
 			if (Security.getInstance().isUserAllowed(loginBean.getUser(), Security.RESOURCE_ALL, Security.ACTION_READ)) {
-
+				errorList.clear();
 				try {
-					new Importer().startImport(request, loginBean);
-					errorList.add("Import successful!");
+					String userFeedback = new Importer().startImport(request, loginBean);
+					// set the message to the session
+					request.getSession(true).setAttribute("userFeedback", userFeedback);
 				} catch (SAXParseException e) {
 					errorList.add("XML file is not well-formed!");
 					e.printStackTrace();

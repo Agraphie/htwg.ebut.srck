@@ -14,7 +14,7 @@
 <body>
 
 <%@ include file="header.jsp" %>
-<%@ include file="error.jsp" %>
+<%@ include file="alert.jsp" %>
 <%@ include file="authentication.jsp" %>
 <%@ include file="navigation.jspfragment" %>
 

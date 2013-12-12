@@ -21,9 +21,9 @@
 			if (res) {
 				document.getElementById("submit").disabled = false;
 			} else {
-				wrongFileType.innerHTML = wrongFileType.innerHTML + '<b><font color="Red">Wrong file type! Only xml files can be imported</font></b>';
-				var errorJsp = document.getElementById('errorJsp');
-				errorJsp.innerHTML = "";
+				wrongFileType.innerHTML = wrongFileType.innerHTML + '<b><font color="Red">Wrong file type! Only xml files can be imported</font></b><br>';
+				var alertJsp = document.getElementById('alertJsp');
+				alertJsp.innerHTML = "";
 			}
 		}
 	}
@@ -33,8 +33,7 @@
 <body>
 
 	<%@ include file="header.jsp"%>
-	<div id=""></div>
-	<%@ include file="error.jsp"%>
+	<%@ include file="alert.jsp"%>
 	<%@ include file="authentication.jsp"%>
 	<%@ include file="navigation.jspfragment"%>
 

@@ -11,7 +11,7 @@
 <body>
 
 <%@ include file="header.jsp" %>
-<%@ include file="error.jsp" %>
+<%@ include file="alert.jsp" %>
 
 <h1>Logout</h1>
 <p>Logout successful!</p>

@@ -65,17 +65,18 @@ public class Importer {
 	 * Method to start the import.
 	 * @param request The despatched request.
 	 * @param loginBean The despatched current loginbean.
+	 * @return Feedback for the user (Creats and Updates)
 	 * @throws SAXException Thrown if uploaded document not well formed.
 	 * @throws IOException Thrown if document can't be saved.
 	 * @throws XPathExpressionException Thrown if xpath expression invalid.
 	 * @throws TooManyPricesForOneCountryException Thrown if a product has more than one price for a country.
 	 */
-	public void startImport(HttpServletRequest request, LoginBean loginBean)throws SAXException,  IOException, XPathExpressionException, TooManyPricesForOneCountryException {
+	public String startImport(HttpServletRequest request, LoginBean loginBean)throws SAXException,  IOException, XPathExpressionException, TooManyPricesForOneCountryException {
 		// get the supplier id and supplier
 		BOSupplier endSupplier = SupplierFinderUtil.supplierFinder(loginBean);
-
 		List<FileItem> items = fileUploadParser(request);
-
+		int amountNewArticles = 0;
+		NodeList articles = null;
 		if (items != null) {
 
 			// koennte null sein
@@ -96,11 +97,22 @@ public class Importer {
 			// could be everything
 			// get XPath factory
 			xpFactory = XPathFactory.newInstance();
-			NodeList articles = (NodeList) xpFactory.newXPath().evaluate("/BMECAT/T_NEW_CATALOG/ARTICLE", parsedUploadedItem, XPathConstants.NODESET);
+			articles = (NodeList) xpFactory.newXPath().evaluate("/BMECAT/T_NEW_CATALOG/ARTICLE", parsedUploadedItem, XPathConstants.NODESET);
 
-			createAndPersistArticles(articles, endSupplier);
-			
+			amountNewArticles = createAndPersistArticles(articles, endSupplier);
 		}
+		return createUserFeedback(amountNewArticles, articles.getLength());
+	}
+
+	/**
+	 * 
+	 * @param amountNewArticles amount updated articles
+	 * @param length amount of imported articles
+	 * @return info message (creats and updates)
+	 */
+	private String createUserFeedback(int amountNewArticles, int amountArticles) {
+		
+		return amountArticles + " articles successfully imported! (" + amountNewArticles + "creates/" + (amountArticles-amountNewArticles + "updates)");
 	}
 
 	/**
@@ -194,9 +206,12 @@ public class Importer {
 	 * Create and persist articles.
 	 * @param articles contains uploaded articles
 	 * @param supplier logged-in supplier
+	 * @return the amount of new articles
 	 * @throws TooManyPricesForOneCountryException in case of > 1 price for one country
 	 */
-	public void createAndPersistArticles(NodeList articles, BOSupplier supplier) throws TooManyPricesForOneCountryException {
+	public int createAndPersistArticles(NodeList articles, BOSupplier supplier) throws TooManyPricesForOneCountryException {
+		//counts the amount of new Articles
+		int amountNewArticles = 0;
 		// iterate over the nodeset and get _all_ the contens!
 		for (int i = 0; i < articles.getLength(); i++) {
 			Element currentArticle = (Element) articles.item(i);
@@ -204,11 +219,10 @@ public class Importer {
 			String supplierAID = "";
 			try {
 				// query the current article and get it's S_AID
-				supplierAID = (String) xpFactory.newXPath().evaluate("SUPPLIER_AID", currentArticle,	XPathConstants.STRING);
+				supplierAID = (String) xpFactory.newXPath().evaluate("SUPPLIER_AID", currentArticle, XPathConstants.STRING);
 			} catch (XPathExpressionException e) {
 				e.printStackTrace();
 			}
-
 			// declare a product
 			BOProduct product;
 
@@ -220,6 +234,7 @@ public class Importer {
 			if (product == null) {
 				// initiate new product if no product was found above
 				product = new BOProduct();
+				amountNewArticles++;
 			}
 
 			for (int j = 0; j < currentArticleChilds.getLength(); j++) {
@@ -243,6 +258,7 @@ public class Importer {
 			}
 
 		}
+		return amountNewArticles;
 	}
 
 	/**
