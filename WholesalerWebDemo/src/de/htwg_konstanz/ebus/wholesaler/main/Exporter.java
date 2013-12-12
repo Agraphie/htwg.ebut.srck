@@ -82,7 +82,7 @@ public class Exporter {
 		        bumblebee.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1");
 		        bumblebee.setOutputProperty(OutputKeys.INDENT, "yes");
 	        } else {
-	        	File stylesheet = new File("C:\\temp\\tranformationBMEcatToXHTML.xslt");
+	        	File stylesheet = new File("C:\\temp\\tranformationBMEcatToXHTML.xsl");
 	    		StreamSource xslt = new StreamSource(stylesheet);
 	        	bumblebee = autobots.newTransformer(xslt);
 	        }
@@ -128,7 +128,8 @@ public class Exporter {
 
 
 	public File getXHTML() {
-		
+		createDocument();
+
 		long ts = new GregorianCalendar().getTimeInMillis();
 		String filename = "\\generatedXHTML_ts="+ts;
 		String fullyQualifiedPathName = repository.getAbsolutePath() + filename + FILETYPE_XHTML;
@@ -136,6 +137,8 @@ public class Exporter {
 		File file = new File(fullyQualifiedPathName);
 		StreamResult streamResult = new StreamResult(file);
 		try {
+			//bumblebee.transform(new DOMSource(doc), streamResult);
+			//new StreamSource(new File("C:\\temp\\articles_bmecat_new_catalog_1_2_simple_V0.96.xml")
 			bumblebee.transform(new DOMSource(doc), streamResult);
 		} catch (TransformerException e) {
 			// TODO Auto-generated catch block
