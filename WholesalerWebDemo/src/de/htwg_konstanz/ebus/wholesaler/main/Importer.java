@@ -229,7 +229,8 @@ public class Importer {
 			// if update product, search for which criteria? Materialnumber
 			// is set by the database (or hibernate?)
 			// product would be null if the EAN is not found.
-			product = ProductBOA.getInstance().findByOrderNumberSupplier(supplierAID);
+			//product = ProductBOA.getInstance().findByCriteria("OrdernumberSupplier", supplierAID).get(0);
+			product = ProductBOA.getInstance().findByOrderNumberCustomer(supplierAID  + "-" +  supplier.getSupplierNumber());
 
 			if (product == null) {
 				// initiate new product if no product was found above
@@ -242,7 +243,7 @@ public class Importer {
 				String currentNodeName = currentArticleChilds.item(j).getNodeName();
 				Element currentNode = (Element) currentArticleChilds.item(j);
 				if (Constants.ARTICLE_SUPPLIER_AID.equals(currentNodeName)) {
-					product = setSupplierAID(currentNode, product);
+					product = setSupplierAID(currentNode, product, supplier.getSupplierNumber());
 				} else if (Constants.ARTICLE_ARTICLE_DETAILS.equals(currentNodeName)) {
 					product = setArticleDetails(currentNode, product);
 				} else if (Constants.ARTICLE_ARTICLE_ORDER_DETAILS.equals(currentNodeName)) {
@@ -281,7 +282,7 @@ public class Importer {
 			String nodeName = referencen.item(i).getNodeName();
 			Element node = (Element) referencen.item(i);
 			if (textContentNotNull(node) && Constants.ARTICLE_ARTICLE_REFERENCE_ART_ID_TO.equals(nodeName)) {
-				BOProduct tempProduct = ProductBOA.getInstance().findByOrderNumberSupplier(node.getTextContent());
+				BOProduct tempProduct = ProductBOA.getInstance().findByCriteria("OrdernumberSupplier", node.getTextContent()).get(0);
 				Product referencedProduct = ProductVOA.getInstance().get(tempProduct.getMaterialNumber());
 				referencePK.setProduct(pro);
 				referencePK.setReferencedproduct(referencedProduct);
@@ -449,12 +450,13 @@ public class Importer {
 	 * 
 	 * @param currentNode in that case <SUPPLIER_AID>
 	 * @param product currentProduct instance
+	 * @param supplierNr 
 	 * 
 	 */
-	private BOProduct setSupplierAID(Node currentNode, BOProduct product) {
+	private BOProduct setSupplierAID(Node currentNode, BOProduct product, String supplierNr) {
 		if (textContentNotNull(currentNode)) {
 			product.setOrderNumberSupplier(currentNode.getTextContent());
-			product.setOrderNumberCustomer(currentNode.getTextContent());
+			product.setOrderNumberCustomer(currentNode.getTextContent() + "-" + supplierNr);
 		}
 		return product;
 	}
