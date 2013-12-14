@@ -1,6 +1,7 @@
 package de.htwg_konstanz.ebus.wholesaler.action;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
@@ -62,6 +63,13 @@ public class ExportProductCatalogAction implements IAction {
 					// now set the file to the session
 					request.getSession(true).setAttribute("file", file);
 
+				    try {
+				    	//instead of getting the output stream in the jsp, we just get it here 
+				    	//and set it in the session
+						request.getSession(true).setAttribute("out", response.getOutputStream());
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 					return "export.jsp";
 				} else {
 					// authorization failed -> show error message

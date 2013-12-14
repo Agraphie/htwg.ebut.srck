@@ -97,7 +97,11 @@ public class ControllerServlet extends HttpServlet
 	*/
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
+		try{
 		dispatchRequest(request, response);
+		}catch(ServletException e){
+			
+		}
 	}
 
 	/** 

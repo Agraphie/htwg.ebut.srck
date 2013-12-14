@@ -32,11 +32,14 @@
 	</form>
 	<% File file = (File) session.getAttribute("file"); 
 		if(file != null){
+			//we got the file, now delete the reference so this event won't trigger again. m'kay?
+			request.getSession(true).setAttribute("file", null);
+
 			String filePath = file.getAbsolutePath();
 			int length   = 0;
 	        ServletOutputStream outStream;
 			try {
-				outStream = response.getOutputStream();
+				outStream = (ServletOutputStream) session.getAttribute("out");
 				ServletContext context = request.getSession().getServletContext();
 		        String mimetype = context.getMimeType(filePath);
 		       
@@ -63,7 +66,6 @@
 		        in.close();
 		        //response is already sent, therefor can't redirect anymore!
 				outStream.close();
-
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
