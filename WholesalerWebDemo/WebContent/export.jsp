@@ -63,9 +63,11 @@
 		            outStream.write(byteBuffer,0,length);
 		        }
 		       
+		        
 		        in.close();
-		        //response is already sent, therefor can't redirect anymore!
+		       	outStream.flush();
 				outStream.close();
+		        file.delete();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

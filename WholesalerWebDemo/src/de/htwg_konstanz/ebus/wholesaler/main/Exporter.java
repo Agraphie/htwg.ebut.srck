@@ -1,6 +1,7 @@
 package de.htwg_konstanz.ebus.wholesaler.main;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -120,7 +121,6 @@ public class Exporter {
 		File file = new File(fullyQualifiedPathName);
 		StreamResult streamResult = new StreamResult(file);
 		try {
-			System.out.println(doc.getLocalName());
 			bumblebee.transform(new DOMSource(doc), streamResult);
 		} catch (TransformerException e) {
 			e.printStackTrace();

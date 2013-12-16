@@ -59,7 +59,8 @@ public class ExportProductCatalogAction implements IAction {
 					} else {
 						file = exporter.getXHTML();
 					}
-
+					
+					System.out.println(file.getAbsolutePath());
 					// now set the file to the session
 					request.getSession(true).setAttribute("file", file);
 
