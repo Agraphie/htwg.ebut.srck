@@ -24,9 +24,9 @@
 	<form method="POST"	action="<%= response.encodeURL("controllerservlet") %> ">
 		<input type="hidden" name="action" value="exportCustomerProducts">
 			<p>Export by Short-Description(optional): <input type="text" name="filter"></p>
-			<h3>Select export format</h5>
-			<p><input type="radio" value="formatBMEcat" name="exportFormat" checked="checked">BMEcat</p>
-			<p><input type="radio" value="formatXhtml" name="exportFormat">XHTML</p>
+			<h3>Select export format</h3>
+			<p><label><input type="radio" value="formatBMEcat" name="exportFormat" checked="checked">BMEcat</label></p>
+			<p><label><input type="radio" value="formatXhtml" name="exportFormat">XHTML</p></label>
 			<p><input type="submit" name="Submit" value="export"></p>
 
 	</form>

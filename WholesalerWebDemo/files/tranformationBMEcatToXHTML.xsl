@@ -54,8 +54,9 @@
 			<xsl:apply-templates select='SUPPLIER_AID'></xsl:apply-templates>
 			<xsl:apply-templates select='ARTICLE_DETAILS'></xsl:apply-templates>
 			<xsl:apply-templates select='ARTICLE_ORDER_DETAILS'></xsl:apply-templates>
-			<xsl:apply-templates select='ARTICLE_PRICE_DETAILS'></xsl:apply-templates>			
+			<xsl:apply-templates select='ARTICLE_PRICE_DETAILS'></xsl:apply-templates>		
 		</li>
+		<hr/>	
 	</xsl:template>
 
 	

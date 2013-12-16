@@ -37,7 +37,7 @@
 	<%@ include file="authentication.jsp"%>
 	<%@ include file="navigation.jspfragment"%>
 
-	<h1>Import Product Catalog</h1>
+	<h1>Import Product Catalog (Simple BMEcat-Format)</h1>
 
 	<form method="POST"	enctype="multipart/form-data" action="<%= response.encodeURL("controllerservlet?action=importSupplierProducts") %> ">
 		File to upload: <input type="file" name="upfile" id="upfile" onChange="buttonEnable(this)"><br /> 
